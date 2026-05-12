@@ -25,12 +25,14 @@ This project uses SQLite and local image uploads. On Vercel, serverless files ar
 ## Local check before deploy
 
 ```bash
-.venv/bin/python -m py_compile app.py
+.venv/bin/python -m py_compile app.py api/index.py
 .venv/bin/flask --app app run --port 5001
 ```
 
 ## Size warning
 
-The `static` folder is large because it contains many car photos. `.vercelignore` excludes unused duplicate HEIC originals to keep the deployment under Vercel's serverless bundle limit.
+The `static` folder is large because it contains many car photos. Vercel serves those files as static assets, while `vercel.json` excludes `static/**` from the Python function bundle using `functions.api/index.py.excludeFiles`.
+
+`.vercelignore` also excludes unused duplicate HEIC originals from the deployment upload.
 
 If Vercel still rejects the deployment because of size, compress the remaining images or host them on Cloudinary/Vercel Blob and store image URLs in the database.

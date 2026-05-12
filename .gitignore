@@ -7,3 +7,5 @@ __pycache__/
 *.pyo
 *.log
 .vercel/
+static/uploads/**/*.HEIC.png
+static/uploads/**/*.heic.png

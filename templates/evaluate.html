@@ -19,7 +19,7 @@
 <form action="/evaluate" method="POST" class="row g-3">
 <div class="col-md-6">
 <label>Brand</label>
-<select name="brand" class="form-control">
+<select name="brand" class="form-control" data-evaluation-brand>
 <option value="">Any Brand</option>
 {% for brand in search_options.brands %}
 <option value="{{ brand }}" {% if current_values.get("brand") == brand %}selected{% endif %}>{{ brand }}</option>
@@ -28,15 +28,33 @@
 </div>
 <div class="col-md-6">
 <label>Model</label>
-<input name="model" class="form-control" value="{{ current_values.get('model', '') }}" placeholder="Altima, Sunny, ES 350">
+<select name="model" class="form-control" data-evaluation-model data-current-model="{{ current_values.get('model', '') }}">
+<option value="">Any Model</option>
+{% for model in search_options.models %}
+<option value="{{ model }}" {% if current_values.get("model") == model %}selected{% endif %}>{{ model }}</option>
+{% endfor %}
+</select>
 </div>
 <div class="col-md-6">
 <label>Year</label>
-<input name="year" type="number" min="1980" max="{{ current_year + 1 }}" class="form-control" value="{{ current_values.get('year', '') }}" placeholder="{{ current_year - 5 }}" required>
+<select name="year" class="form-control" required>
+<option value="">Select Year</option>
+{% set selected_year = current_values.get("year", "") %}
+{% for year in range(current_year + 1, 1979, -1) %}
+<option value="{{ year }}" {% if selected_year == year|string %}selected{% endif %}>{{ year }}</option>
+{% endfor %}
+</select>
 </div>
 <div class="col-md-6">
 <label>Mileage</label>
-<input name="mileage" type="number" min="0" class="form-control" value="{{ current_values.get('mileage', '') }}" placeholder="120000" required>
+<select name="mileage" class="form-control">
+{% set selected_mileage = current_values.get("mileage", "") %}
+<option value="" {% if not selected_mileage %}selected{% endif %}>Any Mileage</option>
+<option value="25000" {% if selected_mileage == "25000" %}selected{% endif %}>Under 50,000 km</option>
+<option value="75000" {% if selected_mileage == "75000" %}selected{% endif %}>50,000 - 100,000 km</option>
+<option value="150000" {% if selected_mileage == "150000" %}selected{% endif %}>100,000 - 200,000 km</option>
+<option value="250000" {% if selected_mileage == "250000" %}selected{% endif %}>200,000 km and above</option>
+</select>
 </div>
 <div class="col-md-6">
 <label>Body Type</label>
@@ -173,5 +191,45 @@
 
 </div>
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const brandSelect = document.querySelector("[data-evaluation-brand]");
+  const modelSelect = document.querySelector("[data-evaluation-model]");
+  const modelsByBrand = {{ search_options.models_by_brand | tojson }};
+  const allModels = {{ search_options.models | tojson }};
+
+  if (!brandSelect || !modelSelect) {
+    return;
+  }
+
+  function populateModels() {
+    const selectedBrand = brandSelect.value;
+    const selectedModel = modelSelect.dataset.currentModel || modelSelect.value;
+    const models = selectedBrand ? (modelsByBrand[selectedBrand] || []) : allModels;
+
+    modelSelect.innerHTML = "";
+    modelSelect.append(new Option("Any Model", ""));
+
+    models.forEach(function (model) {
+      modelSelect.append(new Option(model, model));
+    });
+
+    if (selectedModel && !models.includes(selectedModel)) {
+      modelSelect.append(new Option(selectedModel, selectedModel));
+    }
+
+    modelSelect.value = selectedModel || "";
+    modelSelect.dataset.currentModel = "";
+  }
+
+  brandSelect.addEventListener("change", function () {
+    modelSelect.dataset.currentModel = "";
+    populateModels();
+  });
+
+  populateModels();
+});
+</script>
 
 {% endblock %}

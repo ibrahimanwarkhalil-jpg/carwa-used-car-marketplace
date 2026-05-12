@@ -4,18 +4,57 @@
 
 <section class="page-shell">
 <div class="container">
-<div class="form-shell admin-login-shell">
-<div class="section-head">
-<p class="eyebrow">Admin Access</p>
-<h2>Login</h2>
+<div class="login-grid">
+
+<div class="form-shell login-panel" data-buyer-login-panel {% if error %}hidden{% endif %}>
+<div class="section-head compact-head">
+<p class="eyebrow">Buyer Profile</p>
+<h2>Continue With CARWA</h2>
 </div>
 
-<div class="image-help mb-4">
-Default admin login:
-<br>
-<code>username: admin</code>
-<br>
-<code>password: carwa123</code>
+<p class="login-helper">Enter your details once. CARWA will use them for seller inquiries and test-drive requests while you are logged in.</p>
+
+{% if buyer_error %}
+<div class="image-help mb-3">
+{{ buyer_error }}
+</div>
+{% endif %}
+
+<form method="POST" class="row g-3">
+<input type="hidden" name="account_type" value="buyer">
+<input type="hidden" name="next" value="{{ next_url }}">
+
+<div class="col-12">
+<label>Your Name</label>
+<input class="form-control" name="name" value="{{ session.get('buyer_profile', {}).get('name', '') }}" required>
+</div>
+
+<div class="col-12">
+<label>Email Address</label>
+<input class="form-control" type="email" name="email" value="{{ session.get('buyer_profile', {}).get('email', '') }}" required>
+</div>
+
+<div class="col-12">
+<label>Phone Number</label>
+<input class="form-control" name="phone" value="{{ session.get('buyer_profile', {}).get('phone', '') }}" required>
+</div>
+
+<div class="col-12">
+<button class="btn btn-dark w-100">Save And Continue</button>
+</div>
+</form>
+
+<div class="login-admin-switch">
+<button type="button" class="btn btn-outline-dark" data-admin-login-toggle aria-expanded="{{ 'true' if error else 'false' }}" aria-controls="adminLoginPanel">
+Admin Login
+</button>
+</div>
+</div>
+
+<div class="form-shell login-panel login-admin-panel" id="adminLoginPanel" data-admin-login-panel {% if not error %}hidden{% endif %}>
+<div class="section-head compact-head">
+<p class="eyebrow">Admin Access</p>
+<h2>Login</h2>
 </div>
 
 {% if error %}
@@ -25,9 +64,12 @@ Default admin login:
 {% endif %}
 
 <form method="POST" class="row g-3">
+<input type="hidden" name="account_type" value="admin">
+<input type="hidden" name="next" value="{{ next_url }}">
+
 <div class="col-12">
 <label>Username</label>
-<input class="form-control" name="username" required>
+<input class="form-control" name="username" data-admin-username required>
 </div>
 
 <div class="col-12">
@@ -36,11 +78,56 @@ Default admin login:
 </div>
 
 <div class="col-12">
-<button class="btn btn-dark w-100">Login</button>
+<button class="btn btn-outline-dark w-100">Admin Login</button>
 </div>
 </form>
+
+<div class="login-admin-switch">
+<button type="button" class="btn btn-outline-dark" data-buyer-login-toggle>
+Customer Login
+</button>
+</div>
+</div>
+
 </div>
 </div>
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const toggle = document.querySelector("[data-admin-login-toggle]");
+  const buyerToggle = document.querySelector("[data-buyer-login-toggle]");
+  const buyerPanel = document.querySelector("[data-buyer-login-panel]");
+  const panel = document.querySelector("[data-admin-login-panel]");
+  const username = document.querySelector("[data-admin-username]");
+  const buyerName = document.querySelector("[data-buyer-login-panel] input[name='name']");
+
+  if (!toggle || !panel || !buyerPanel) {
+    return;
+  }
+
+  toggle.addEventListener("click", function () {
+    panel.hidden = false;
+    buyerPanel.hidden = true;
+    toggle.setAttribute("aria-expanded", "true");
+
+    if (username) {
+      username.focus();
+    }
+  });
+
+  if (buyerToggle) {
+    buyerToggle.addEventListener("click", function () {
+      buyerPanel.hidden = false;
+      panel.hidden = true;
+      toggle.setAttribute("aria-expanded", "false");
+
+      if (buyerName) {
+        buyerName.focus();
+      }
+    });
+  }
+});
+</script>
 
 {% endblock %}

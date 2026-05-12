@@ -41,14 +41,19 @@
 </select>
 
 <label>Model</label>
-<input class="form-control" value="All" readonly>
+<select name="model" class="form-control">
+<option value="">Any Model</option>
+{% for model in search_options.models %}
+<option value="{{ model }}" {% if current_filters.get("model") == model %}selected{% endif %}>{{ model }}</option>
+{% endfor %}
+</select>
 
 <label>Year</label>
 <input name="year" class="form-control" value="{{ current_filters.get('year', '') }}" placeholder="2020">
 
 <label>Price Range (AED)</label>
 <div class="price-input-grid">
-<input name="min_price" class="form-control" value="{{ current_filters.get('min_price', '') }}" placeholder="5000">
+<input name="min_price" class="form-control" value="{{ current_filters.get('min_price', '') }}" placeholder="{{ search_options.price_floor }}">
 <input name="max_price" class="form-control" value="{{ current_filters.get('max_price', current_filters.get('price', '')) }}" placeholder="{{ search_options.price_ceiling }}">
 </div>
 

@@ -106,11 +106,28 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 {% endif %}
 </div>
 
-<div class="row g-3 mt-4">
+{% set buyer_profile = session.get("buyer_profile") %}
+<div class="row g-3 mt-4 lead-form-grid">
 <div class="col-md-6">
-<div class="form-shell h-100">
+<div class="form-shell lead-form-shell h-100">
+<div class="lead-form-intro">
 <h4>Contact Seller</h4>
-<form method="POST" action="/lead/contact/{{ car.id }}" class="row g-3">
+<p>Ask a question about this vehicle.</p>
+<button type="button" class="btn btn-dark lead-open-button" data-lead-toggle="contactLeadForm">Open Contact Form</button>
+</div>
+<form method="POST" action="/lead/contact/{{ car.id }}" class="row g-3 lead-hidden-form" id="contactLeadForm" hidden>
+{% if buyer_profile %}
+<div class="col-12">
+<div class="lead-profile-note">
+<span>Sending as <strong>{{ buyer_profile.name }}</strong></span>
+<small>{{ buyer_profile.email }} | {{ buyer_profile.phone }}</small>
+<a href="/logout?next=/car/{{ car.id }}">Change details</a>
+</div>
+<input type="hidden" name="name" value="{{ buyer_profile.name }}">
+<input type="hidden" name="email" value="{{ buyer_profile.email }}">
+<input type="hidden" name="phone" value="{{ buyer_profile.phone }}">
+</div>
+{% else %}
 <div class="col-12">
 <input class="form-control" name="name" placeholder="Your Name" required>
 </div>
@@ -120,20 +137,37 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 <div class="col-12">
 <input class="form-control" name="phone" placeholder="Phone Number" required>
 </div>
+{% endif %}
 <div class="col-12">
 <textarea class="form-control" name="message" rows="4" placeholder="Tell us what you want to know"></textarea>
 </div>
 <div class="col-12">
-<button class="btn btn-dark">Send Inquiry</button>
+<button class="btn btn-dark lead-submit-button">Send Inquiry</button>
 </div>
 </form>
 </div>
 </div>
 
 <div class="col-md-6">
-<div class="form-shell h-100">
+<div class="form-shell lead-form-shell h-100">
+<div class="lead-form-intro">
 <h4>Book Test Drive</h4>
-<form method="POST" action="/lead/book/{{ car.id }}" class="row g-3">
+<p>Choose a preferred appointment date and time.</p>
+<button type="button" class="btn btn-dark lead-open-button" data-lead-toggle="testDriveLeadForm">Choose Appointment</button>
+</div>
+<form method="POST" action="/lead/book/{{ car.id }}" class="row g-3 lead-hidden-form" id="testDriveLeadForm" hidden>
+{% if buyer_profile %}
+<div class="col-12">
+<div class="lead-profile-note">
+<span>Booking as <strong>{{ buyer_profile.name }}</strong></span>
+<small>{{ buyer_profile.email }} | {{ buyer_profile.phone }}</small>
+<a href="/logout?next=/car/{{ car.id }}">Change details</a>
+</div>
+<input type="hidden" name="name" value="{{ buyer_profile.name }}">
+<input type="hidden" name="email" value="{{ buyer_profile.email }}">
+<input type="hidden" name="phone" value="{{ buyer_profile.phone }}">
+</div>
+{% else %}
 <div class="col-12">
 <input class="form-control" name="name" placeholder="Your Name" required>
 </div>
@@ -143,6 +177,7 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 <div class="col-12">
 <input class="form-control" name="phone" placeholder="Phone Number" required>
 </div>
+{% endif %}
 <div class="col-6">
 <input class="form-control" type="date" name="preferred_date" required>
 </div>
@@ -150,7 +185,7 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 <input class="form-control" type="time" name="preferred_time" required>
 </div>
 <div class="col-12">
-<button class="btn btn-outline-dark">Request Test Drive</button>
+<button class="btn btn-dark lead-submit-button">Request Test Drive</button>
 </div>
 </form>
 </div>
@@ -193,6 +228,19 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll("[data-lead-toggle]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const form = document.getElementById(button.dataset.leadToggle);
+      if (!form) {
+        return;
+      }
+
+      form.hidden = !form.hidden;
+      button.textContent = form.hidden ? button.dataset.closedLabel : "Hide Form";
+    });
+    button.dataset.closedLabel = button.textContent;
+  });
+
   const viewer = document.querySelector(".detail-image-viewer");
   const mainImage = document.getElementById("mainCarImage");
   const mainImagePath = document.getElementById("mainImagePath");
@@ -201,6 +249,13 @@ document.addEventListener("DOMContentLoaded", function () {
   const nextButton = document.querySelector(".detail-nav-next");
   const galleryImages = viewer ? JSON.parse(viewer.dataset.galleryImages || "[]") : [];
   let currentIndex = 0;
+  let galleryTimer = null;
+
+  function markActiveThumb(path) {
+    thumbs.forEach(function (thumb) {
+      thumb.classList.toggle("is-active", thumb.getAttribute("data-image-path") === path);
+    });
+  }
 
   function showImageByIndex(index) {
     if (!galleryImages.length) {
@@ -211,29 +266,52 @@ document.addEventListener("DOMContentLoaded", function () {
     const path = "/static/uploads/" + galleryImages[currentIndex];
     mainImage.src = path;
     mainImagePath.innerHTML = "<strong>Main image:</strong> <code>" + path + "</code>";
+    markActiveThumb(path);
+  }
+
+  function startGalleryAutoPlay() {
+    if (galleryImages.length <= 1 || galleryTimer) {
+      return;
+    }
+
+    galleryTimer = setInterval(function () {
+      showImageByIndex(currentIndex + 1);
+    }, 4200);
+  }
+
+  function resetGalleryAutoPlay() {
+    if (galleryTimer) {
+      clearInterval(galleryTimer);
+      galleryTimer = null;
+    }
+    startGalleryAutoPlay();
   }
 
   thumbs.forEach(function (thumb) {
     thumb.addEventListener("click", function () {
-      const src = thumb.getAttribute("data-image-src");
       const path = thumb.getAttribute("data-image-path");
       currentIndex = galleryImages.indexOf(path.replace("/static/uploads/", ""));
-      mainImage.src = src;
-      mainImagePath.innerHTML = "<strong>Main image:</strong> <code>" + path + "</code>";
+      showImageByIndex(currentIndex);
+      resetGalleryAutoPlay();
     });
   });
 
   if (prevButton) {
     prevButton.addEventListener("click", function () {
       showImageByIndex(currentIndex - 1);
+      resetGalleryAutoPlay();
     });
   }
 
   if (nextButton) {
     nextButton.addEventListener("click", function () {
       showImageByIndex(currentIndex + 1);
+      resetGalleryAutoPlay();
     });
   }
+
+  showImageByIndex(0);
+  startGalleryAutoPlay();
 });
 </script>
 

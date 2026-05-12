@@ -15,6 +15,7 @@ LISTINGS_PER_PAGE = 6
 HOME_FEATURED_CARS_LIMIT = 12
 PRICE_FLOOR = 5000
 PRICE_CEILING = 100000
+SEARCH_PRICE_MIN = PRICE_FLOOR
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 IS_VERCEL = os.environ.get("VERCEL") == "1"
@@ -152,18 +153,52 @@ ALL_CAR_BRANDS = [
 ]
 
 ALL_CAR_CATEGORIES = [
-    "Sedan",
-    "SUV",
-    "Pickup Truck",
-    "Sports",
-    "Hatchback",
-    "Crossover",
     "Convertible",
     "Coupe",
+    "Crossover",
+    "Hatchback",
+    "Pickup Truck",
+    "Sedan",
+    "Sports",
+    "SUV",
     "Van",
     "Wagon",
     "Minivan",
 ]
+
+HOMEPAGE_POPULAR_CATEGORIES = [
+    "Hatchback",
+    "Minivan",
+    "Sedan",
+    "SUV",
+    "Sports",
+    "Crossover",
+    "Pickup Truck",
+]
+
+CATEGORY_ICON_CLASSES = {
+    "Convertible": "fa-solid fa-car-side",
+    "Coupe": "fa-solid fa-car-rear",
+    "Crossover": "fa-solid fa-car",
+    "Hatchback": "fa-solid fa-car-side",
+    "Pickup Truck": "fa-solid fa-truck-pickup",
+    "Sedan": "fa-solid fa-car",
+    "Sports": "fa-solid fa-gauge-high",
+    "SUV": "fa-solid fa-car-side",
+    "Van": "fa-solid fa-van-shuttle",
+    "Wagon": "fa-solid fa-car-side",
+    "Minivan": "fa-solid fa-van-shuttle",
+}
+
+CATEGORY_IMAGE_PATHS = {
+    "Crossover": "uploads/categories_pictures/crossover.png",
+    "Hatchback": "uploads/categories_pictures/hatchback.png",
+    "Pickup Truck": "uploads/categories_pictures/pickup-truck.png",
+    "Sedan": "uploads/categories_pictures/sedan.png",
+    "Sports": "uploads/categories_pictures/sports.png",
+    "SUV": "uploads/categories_pictures/suv.png",
+    "Minivan": "uploads/categories_pictures/minivan.png",
+}
 
 SUNNY_2009_LISTING = {
     "title": "2009 Nissan Sunny 1.6 GCC Specs",
@@ -934,18 +969,18 @@ PAJERO_2014_LISTING = {
     "price": 25000,
     "mileage": 202000,
     "description": "Pearl white Mitsubishi Pajero with GCC specs, beige interior, full option trim, excellent condition, and service history available.",
-    "image": "pajero_2012/pajero2012_6.HEIC.png",
+    "image": "pajero_2012/pajero2012_6.jpg",
     "gallery_images": [
-        "pajero_2012/pajero2012_2.HEIC.png",
-        "pajero_2012/pajero2012_3.HEIC.png",
+        "pajero_2012/pajero2012_2.jpg",
+        "pajero_2012/pajero2012_3.jpg",
         "pajero_2012/pajero2012_4.jpg",
-        "pajero_2012/pajero2012_5.HEIC.png",
-        "pajero_2012/pajero2012_6.HEIC.png",
-        "pajero_2012/pajero2012_7.HEIC.png",
-        "pajero_2012/pajero2012_8.HEIC.png",
-        "pajero_2012/pajero2012_9.HEIC.png",
-        "pajero_2012/pajero2012_10.HEIC.png",
-        "pajero_2012/pajero2012_11.HEIC.png",
+        "pajero_2012/pajero2012_5.jpg",
+        "pajero_2012/pajero2012_6.jpg",
+        "pajero_2012/pajero2012_7.jpg",
+        "pajero_2012/pajero2012_8.jpg",
+        "pajero_2012/pajero2012_9.jpg",
+        "pajero_2012/pajero2012_10.jpg",
+        "pajero_2012/pajero2012_11.jpg",
     ],
     "category": "SUV",
     "location": "Dubai",
@@ -967,18 +1002,18 @@ PAJERO_2020_LISTING = {
     "price": 50000,
     "mileage": 108000,
     "description": "Red Mitsubishi Pajero with GCC specs, beige interior, excellent condition, no maintenance required, and service records available.",
-    "image": "pajero_2016/pajero2020_1.heic.png",
+    "image": "pajero_2016/pajero2020_1.jpg",
     "gallery_images": [
-        "pajero_2016/pajero2020_2.heic.png",
-        "pajero_2016/pajero2020_3.heic.png",
-        "pajero_2016/pajero2020_4.HEIC.png",
-        "pajero_2016/pajero2020_5.HEIC.png",
-        "pajero_2016/pajero2020_6.HEIC.png",
-        "pajero_2016/pajero2020_7.heic.png",
-        "pajero_2016/pajero2020_8.heic.png",
-        "pajero_2016/pajero2020_9.heic.png",
-        "pajero_2016/pajero2020_10.HEIC.png",
-        "pajero_2016/pajero2020_11.HEIC.png",
+        "pajero_2016/pajero2020_2.jpg",
+        "pajero_2016/pajero2020_3.jpg",
+        "pajero_2016/pajero2020_4.jpg",
+        "pajero_2016/pajero2020_5.jpg",
+        "pajero_2016/pajero2020_6.jpg",
+        "pajero_2016/pajero2020_7.jpg",
+        "pajero_2016/pajero2020_8.jpg",
+        "pajero_2016/pajero2020_9.jpg",
+        "pajero_2016/pajero2020_10.jpg",
+        "pajero_2016/pajero2020_11.jpg",
     ],
     "category": "SUV",
     "location": "Dubai",
@@ -1011,14 +1046,14 @@ SAMPLE_CARS = [
         "status": "Available",
     },
     {
-        "title": "Nissan Altima SV",
-        "brand": "Nissan",
-        "model": "Altima",
+        "title": "Toyota Camry SE 2018",
+        "brand": "Toyota",
+        "model": "Camry SE",
         "year": 2018,
         "price": 39000,
-        "mileage": 120000,
-        "description": "Well-kept daily driver with smooth handling and a spacious cabin.",
-        "image": "altima.jpg",
+        "mileage": 118000,
+        "description": "Well-kept midsize sedan with smooth automatic driving, practical cabin space, and similar value-focused pricing.",
+        "image": "camry.jpg",
         "category": "Sedan",
         "location": "Sharjah",
         "fuel_type": "Petrol",
@@ -1451,7 +1486,7 @@ SAMPLE_CARS = [
 ]
 
 DESCRIPTION_OVERRIDES = {
-    "Nissan Altima SV": "Well-kept sedan with a spacious cabin, smooth automatic drive, and comfortable everyday usability. Clean presentation, good fuel efficiency for its class, and practical family-friendly comfort make it an easy daily driver.",
+    "Toyota Camry SE 2018": "Well-kept Toyota Camry SE with smooth automatic driving, practical midsize sedan comfort, and value-focused pricing around the same market band. Clean presentation, dependable everyday usability, and strong resale appeal make it a sensible daily driver.",
     "2009 Nissan Sunny 1.6 GCC Specs": "Golden Nissan Sunny 1.6 with GCC specs, 380k km, and a very well maintained ownership history. Practical daily sedan with straightforward running costs, clean presentation, and dependable city-use comfort.",
     "2017 Nissan Altima GCC Specs": "White Nissan Altima with GCC specs, beige interior, and 142k km on the odometer. Excellent condition sedan with a roomy cabin, smooth automatic drive, and a strong maintenance profile for daily use.",
     "2010 Lexus ES 350 American Specs": "Dark grey Lexus ES 350 with American specs, 260k km, and a striking orange leather interior. Comfortable V6 luxury sedan with a quiet ride, refined cabin feel, and a beautifully presented interior that stands out from typical listings.",
@@ -1585,6 +1620,18 @@ def init_db():
     )
     conn.execute(
         """
+        CREATE TABLE IF NOT EXISTS buyer_profiles(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            email TEXT UNIQUE,
+            phone TEXT,
+            created_at TEXT,
+            updated_at TEXT
+        )
+        """
+    )
+    conn.execute(
+        """
         CREATE TABLE IF NOT EXISTS leads(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             car_id INTEGER,
@@ -1679,6 +1726,90 @@ def seed_sample_cars(force=False):
                 car.get("seller_phone", "+971582119936"),
                 car.get("seller_type", "Dealership"),
             ),
+        )
+
+    conn.commit()
+    conn.close()
+    return True
+
+
+def ensure_sample_sedan_replacement():
+    replacement = next(
+        (car for car in SAMPLE_CARS if car["title"] == "Toyota Camry SE 2018"),
+        None,
+    )
+    if not replacement:
+        return False
+
+    conn = get_db()
+    old_row = conn.execute(
+        "SELECT id FROM cars WHERE title = ?",
+        ("Nissan Altima SV",),
+    ).fetchone()
+    replacement_row = conn.execute(
+        "SELECT id FROM cars WHERE title = ?",
+        (replacement["title"],),
+    ).fetchone()
+
+    car_values = (
+        replacement["title"],
+        replacement["brand"],
+        replacement["model"],
+        replacement["year"],
+        replacement["price"],
+        replacement["mileage"],
+        replacement["description"],
+        replacement["image"],
+        replacement["category"],
+        replacement["location"],
+        replacement["fuel_type"],
+        replacement["transmission"],
+        replacement["condition"],
+        replacement["featured"],
+        replacement["status"],
+        replacement.get("seller_name", "CARWA Auto"),
+        replacement.get("seller_phone", "+971582119936"),
+        replacement.get("seller_type", "Dealership"),
+    )
+
+    if replacement_row:
+        target_id = replacement_row["id"]
+        conn.execute(
+            """
+            UPDATE cars
+            SET title = ?, brand = ?, model = ?, year = ?, price = ?, mileage = ?,
+                description = ?, image = ?, category = ?, location = ?, fuel_type = ?,
+                transmission = ?, condition = ?, featured = ?, status = ?,
+                seller_name = ?, seller_phone = ?, seller_type = ?
+            WHERE id = ?
+            """,
+            (*car_values, target_id),
+        )
+        if old_row and old_row["id"] != target_id:
+            conn.execute("DELETE FROM car_images WHERE car_id = ?", (old_row["id"],))
+            conn.execute("DELETE FROM wishlist WHERE car_id = ?", (old_row["id"],))
+            conn.execute("DELETE FROM leads WHERE car_id = ?", (old_row["id"],))
+            conn.execute("DELETE FROM cars WHERE id = ?", (old_row["id"],))
+    elif old_row:
+        conn.execute(
+            """
+            UPDATE cars
+            SET title = ?, brand = ?, model = ?, year = ?, price = ?, mileage = ?,
+                description = ?, image = ?, category = ?, location = ?, fuel_type = ?,
+                transmission = ?, condition = ?, featured = ?, status = ?,
+                seller_name = ?, seller_phone = ?, seller_type = ?
+            WHERE id = ?
+            """,
+            (*car_values, old_row["id"]),
+        )
+    else:
+        conn.execute(
+            """
+            INSERT INTO cars
+            (title, brand, model, year, price, mileage, description, image, category, location, fuel_type, transmission, condition, featured, status, seller_name, seller_phone, seller_type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            car_values,
         )
 
     conn.commit()
@@ -1869,7 +2000,7 @@ def ensure_altima_listing():
                 altima["description"],
                 altima["image"],
                 altima["category"],
-                altima["location"],
+                altima["location"], 
                 altima["fuel_type"],
                 altima["transmission"],
                 altima["condition"],
@@ -3949,6 +4080,7 @@ def bootstrap_data():
     init_db()
     migrate_db()
     seed_sample_cars()
+    ensure_sample_sedan_replacement()
     prune_unwanted_listings()
     seed_sample_blogs()
     ensure_sunny_listing()
@@ -3984,15 +4116,48 @@ def bootstrap_data():
 def fetch_search_options():
     conn = get_db()
     fuel_types = conn.execute("SELECT DISTINCT fuel_type FROM cars ORDER BY fuel_type").fetchall()
+    models = conn.execute(
+        """
+        SELECT DISTINCT model
+        FROM cars
+        WHERE status = 'Available' AND model IS NOT NULL AND model != ''
+        ORDER BY model
+        """
+    ).fetchall()
+    brand_models = conn.execute(
+        """
+        SELECT DISTINCT brand, model
+        FROM cars
+        WHERE status = 'Available'
+            AND brand IS NOT NULL AND brand != ''
+            AND model IS NOT NULL AND model != ''
+        ORDER BY brand, model
+        """
+    ).fetchall()
     transmissions = conn.execute(
         "SELECT DISTINCT transmission FROM cars ORDER BY transmission"
     ).fetchall()
     conditions = conn.execute(
         "SELECT DISTINCT condition FROM cars ORDER BY condition"
     ).fetchall()
+    price_bounds = conn.execute(
+        """
+        SELECT MIN(price) AS min_price, MAX(price) AS max_price
+        FROM cars
+        WHERE status = 'Available'
+        """
+    ).fetchone()
     conn.close()
+    price_floor = PRICE_FLOOR
+    price_ceiling = int(price_bounds["max_price"] or PRICE_CEILING)
+    models_by_brand = {}
+    for row in brand_models:
+        models_by_brand.setdefault(row["brand"], []).append(row["model"])
+
     return {
         "brands": ALL_CAR_BRANDS,
+        "models": [row["model"] for row in models],
+        "models_by_brand": models_by_brand,
         "categories": ALL_CAR_CATEGORIES,
         "locations": [
             "Abu Dhabi",
@@ -4006,8 +4171,9 @@ def fetch_search_options():
         "fuel_types": [row["fuel_type"] for row in fuel_types],
         "transmissions": [row["transmission"] for row in transmissions],
         "conditions": [row["condition"] for row in conditions],
-        "price_floor": PRICE_FLOOR,
-        "price_ceiling": PRICE_CEILING,
+        "price_floor": price_floor,
+        "price_slider_floor": SEARCH_PRICE_MIN,
+        "price_ceiling": max(price_floor, price_ceiling),
     }
 
 
@@ -4034,6 +4200,91 @@ def fetch_stats():
     }
 
 
+def fetch_admin_stats():
+    conn = get_db()
+    status_rows = conn.execute(
+        """
+        SELECT COALESCE(status, 'Available') AS status, COUNT(*) AS total
+        FROM cars
+        GROUP BY COALESCE(status, 'Available')
+        """
+    ).fetchall()
+    lead_status_rows = conn.execute(
+        """
+        SELECT COALESCE(status, 'New') AS status, COUNT(*) AS total
+        FROM leads
+        GROUP BY COALESCE(status, 'New')
+        """
+    ).fetchall()
+    lead_type_rows = conn.execute(
+        """
+        SELECT COALESCE(lead_type, 'general') AS lead_type, COUNT(*) AS total
+        FROM leads
+        GROUP BY COALESCE(lead_type, 'general')
+        """
+    ).fetchall()
+    featured_count = conn.execute(
+        "SELECT COUNT(*) AS total FROM cars WHERE featured = 1 AND status = 'Available'"
+    ).fetchone()["total"]
+    brand_count = conn.execute(
+        "SELECT COUNT(DISTINCT brand) AS total FROM cars WHERE status = 'Available'"
+    ).fetchone()["total"]
+    avg_price = conn.execute(
+        "SELECT AVG(price) AS avg_price FROM cars WHERE status = 'Available'"
+    ).fetchone()["avg_price"]
+    conn.close()
+
+    car_status_counts = {row["status"]: row["total"] for row in status_rows}
+    lead_status_counts = {row["status"]: row["total"] for row in lead_status_rows}
+    lead_type_counts = {row["lead_type"]: row["total"] for row in lead_type_rows}
+    lead_count = sum(lead_status_counts.values())
+    total_listings = sum(car_status_counts.values())
+    available_listings = car_status_counts.get("Available", 0)
+    pending_listings = car_status_counts.get("Pending Review", 0)
+    sold_listings = car_status_counts.get("Sold", 0)
+    archived_listings = car_status_counts.get("Archived", 0)
+    inventory_target = 50
+    brand_target = 12
+    lead_pipeline_limit = 20
+    published_scope = max(available_listings + pending_listings + sold_listings, 1)
+    featured_display_limit = HOME_FEATURED_CARS_LIMIT
+
+    def capped_progress(value, limit):
+        if not limit:
+            return 0
+        return min(100, int(round((value / limit) * 100)))
+
+    return {
+        "total_listings": total_listings,
+        "available_listings": available_listings,
+        "pending_listings": pending_listings,
+        "sold_listings": sold_listings,
+        "archived_listings": archived_listings,
+        "featured_listings": featured_count,
+        "featured_display_count": min(featured_count, featured_display_limit),
+        "featured_display_limit": featured_display_limit,
+        "brand_count": brand_count,
+        "brand_target": brand_target,
+        "avg_price": int(avg_price or 0),
+        "inventory_target": inventory_target,
+        "available_progress": capped_progress(available_listings, inventory_target),
+        "featured_progress": capped_progress(min(featured_count, featured_display_limit), featured_display_limit),
+        "published_progress": min(100, int(round((available_listings / published_scope) * 100))),
+        "brand_progress": capped_progress(brand_count, brand_target),
+        "lead_pipeline_limit": lead_pipeline_limit,
+        "lead_progress": capped_progress(lead_count, lead_pipeline_limit),
+        "lead_count": lead_count,
+        "new_leads": lead_status_counts.get("New", 0),
+        "contacted_leads": lead_status_counts.get("Contacted", 0),
+        "qualified_leads": lead_status_counts.get("Qualified", 0),
+        "closed_leads": lead_status_counts.get("Closed", 0),
+        "seller_leads": lead_type_counts.get("seller", 0),
+        "test_drive_leads": lead_type_counts.get("test_drive", 0),
+        "finance_leads": lead_type_counts.get("finance", 0),
+        "contact_leads": lead_type_counts.get("contact", 0),
+    }
+
+
 def fetch_car_options():
     conn = get_db()
     options = conn.execute(
@@ -4041,6 +4292,30 @@ def fetch_car_options():
     ).fetchall()
     conn.close()
     return options
+
+
+def build_popular_categories(category_rows):
+    category_totals = {
+        row["category"]: row["total"]
+        for row in category_rows
+    }
+    categories = [
+        {
+            "category": category,
+            "total": category_totals.get(category, 0),
+            "icon_class": CATEGORY_ICON_CLASSES.get(category, "fa-solid fa-car"),
+            "image": CATEGORY_IMAGE_PATHS.get(category),
+        }
+        for category in HOMEPAGE_POPULAR_CATEGORIES
+    ]
+    return sorted(
+        categories,
+        key=lambda category: (
+            category["total"] == 0,
+            -category["total"],
+            HOMEPAGE_POPULAR_CATEGORIES.index(category["category"]),
+        ),
+    )
 
 
 def hash_password(password):
@@ -4123,7 +4398,7 @@ def build_car_search_query(args):
 
     if min_price.isdigit():
         clauses.append("price >= ?")
-        params.append(max(int(min_price), PRICE_FLOOR))
+        params.append(max(int(min_price), SEARCH_PRICE_MIN))
 
     if max_price.isdigit():
         clauses.append("price <= ?")
@@ -4177,6 +4452,48 @@ def create_lead(car_id, name, email, phone, message, lead_type):
     )
     conn.commit()
     conn.close()
+
+
+def normalize_next_url(next_url, fallback="/"):
+    if not next_url or not next_url.startswith("/") or next_url.startswith("//"):
+        return fallback
+    return next_url
+
+
+def save_buyer_profile(name, email, phone):
+    clean_name = name.strip()
+    clean_email = email.strip().lower()
+    clean_phone = phone.strip()
+    timestamp = datetime.now().isoformat(timespec="seconds")
+    conn = get_db()
+    conn.execute(
+        """
+        INSERT INTO buyer_profiles (name, email, phone, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(email) DO UPDATE SET
+            name = excluded.name,
+            phone = excluded.phone,
+            updated_at = excluded.updated_at
+        """,
+        (clean_name, clean_email, clean_phone, timestamp, timestamp),
+    )
+    conn.commit()
+    conn.close()
+
+    session["buyer_profile"] = {
+        "name": clean_name,
+        "email": clean_email,
+        "phone": clean_phone,
+    }
+
+
+def get_lead_identity():
+    buyer_profile = session.get("buyer_profile") or {}
+    return (
+        (request.form.get("name") or buyer_profile.get("name") or "").strip(),
+        (request.form.get("email") or buyer_profile.get("email") or "").strip(),
+        (request.form.get("phone") or buyer_profile.get("phone") or "").strip(),
+    )
 
 
 def is_admin_logged_in():
@@ -4338,7 +4655,7 @@ def build_price_evaluation(form_data):
 
     if not vehicle["year"] or vehicle["year"] < 1980 or vehicle["year"] > current_year + 1:
         errors.append(f"Enter a valid model year between 1980 and {current_year + 1}.")
-    if vehicle["mileage"] is None or vehicle["mileage"] < 0:
+    if vehicle["mileage"] is not None and vehicle["mileage"] < 0:
         errors.append("Enter a valid mileage value.")
 
     if errors:
@@ -4429,8 +4746,59 @@ def recommendation_reason(reasons, reason):
         reasons.append(reason)
 
 
+def build_recommendation_preferences(args):
+    fuel_type = args.get("fuel_type", "").strip()
+    transmission = args.get("transmission", "").strip()
+    if fuel_type in {"", "Any Fuel Type", "All"}:
+        fuel_type = "Petrol"
+    if transmission in {"", "Any Transmission", "All"}:
+        transmission = "Automatic"
+
+    return {
+        "budget": args.get("budget", "").strip(),
+        "category": args.get("category", "").strip(),
+        "brand": args.get("brand", "").strip(),
+        "location": args.get("location", "").strip(),
+        "fuel_type": fuel_type,
+        "transmission": transmission,
+        "min_year": args.get("min_year", "").strip(),
+        "max_mileage": args.get("max_mileage", "").strip(),
+        "priority": args.get("priority", "balanced").strip() or "balanced",
+    }
+
+
+def car_matches_recommendation_preferences(car, preferences):
+    budget = parse_int(preferences.get("budget"))
+    min_year = parse_int(preferences.get("min_year"))
+    max_mileage = parse_int(preferences.get("max_mileage"))
+    price = parse_int(car.get("price"), 0) or 0
+    year = parse_int(car.get("year"), 0) or 0
+    mileage = parse_int(car.get("mileage"), 0) or 0
+
+    exact_filters = [
+        ("category", "category"),
+        ("brand", "brand"),
+        ("location", "location"),
+        ("fuel_type", "fuel_type"),
+        ("transmission", "transmission"),
+    ]
+    for preference_key, car_key in exact_filters:
+        preference_value = preferences.get(preference_key)
+        if preference_value and normalize_text(preference_value) != normalize_text(car.get(car_key)):
+            return False
+
+    if budget and price > budget:
+        return False
+    if min_year and year < min_year:
+        return False
+    if max_mileage and max_mileage < 999999 and mileage > max_mileage:
+        return False
+
+    return True
+
+
 def score_recommendation(car, preferences, average_price):
-    score = 34.0
+    score = 42.0
     reasons = []
     budget = parse_int(preferences.get("budget"))
     min_year = parse_int(preferences.get("min_year"))
@@ -4439,95 +4807,98 @@ def score_recommendation(car, preferences, average_price):
     price = parse_int(car.get("price"), 0) or 0
     year = parse_int(car.get("year"), 0) or 0
     mileage = parse_int(car.get("mileage"), 0) or 0
+    current_year = datetime.now().year
+    age_span = max(1, current_year + 1 - 2007)
+    year_quality = max(0, min(1, (year - 2007) / age_span))
+    mileage_quality = max(0, min(1, 1 - (mileage / 320000)))
+    value_quality = 0.5
+    if average_price and price:
+        value_quality = max(0, min(1, average_price / price / 1.35))
+    condition_quality = condition_factor(car.get("condition"))
+    condition_quality = max(0, min(1, (condition_quality - 0.75) / 0.4))
+
+    score += year_quality * 12
+    score += mileage_quality * 10
+    score += value_quality * 8
+    score += condition_quality * 4
+    if parse_int(car.get("featured"), 0):
+        score += 2
 
     if budget:
-        if price <= budget:
-            score += 24
-            recommendation_reason(reasons, "Within your budget")
-            if price <= budget * 0.88:
-                score += 4
-                recommendation_reason(reasons, "Leaves budget room")
-        else:
-            over_budget = (price - budget) / budget
-            score -= min(26, over_budget * 80)
-            if over_budget <= 0.12:
-                recommendation_reason(reasons, "Slightly above budget")
+        budget_room = max(0, min(1, (budget - price) / budget))
+        score += 7 + (budget_room * 5)
+        recommendation_reason(reasons, "Within your budget")
+        if budget_room >= 0.18:
+            recommendation_reason(reasons, "Leaves budget room")
 
     if preferences.get("category") and normalize_text(preferences.get("category")) == normalize_text(car.get("category")):
-        score += 15
+        score += 6
         recommendation_reason(reasons, "Matches preferred body type")
     if preferences.get("brand") and normalize_text(preferences.get("brand")) == normalize_text(car.get("brand")):
-        score += 11
+        score += 5
         recommendation_reason(reasons, "Matches preferred brand")
     if preferences.get("location") and normalize_text(preferences.get("location")) == normalize_text(car.get("location")):
-        score += 8
+        score += 4
         recommendation_reason(reasons, "Available in preferred location")
     if preferences.get("fuel_type") and normalize_text(preferences.get("fuel_type")) == normalize_text(car.get("fuel_type")):
-        score += 5
-        recommendation_reason(reasons, "Preferred fuel type")
+        score += 3
+        recommendation_reason(reasons, f"{preferences.get('fuel_type')} fuel type")
     if preferences.get("transmission") and normalize_text(preferences.get("transmission")) == normalize_text(car.get("transmission")):
-        score += 5
-        recommendation_reason(reasons, "Preferred transmission")
+        score += 3
+        recommendation_reason(reasons, f"{preferences.get('transmission')} transmission")
 
     if min_year:
-        if year >= min_year:
-            score += 10
-            recommendation_reason(reasons, "Meets minimum year")
-        else:
-            score -= min(14, (min_year - year) * 3)
+        score += min(7, max(2, (year - min_year + 1) * 1.2))
+        recommendation_reason(reasons, "Meets minimum year")
 
     if max_mileage:
-        if mileage <= max_mileage:
-            score += 10
-            recommendation_reason(reasons, "Mileage fits your limit")
+        if max_mileage < 999999:
+            mileage_room = max(0, min(1, (max_mileage - mileage) / max_mileage))
+            score += 4 + (mileage_room * 4)
         else:
-            score -= min(16, ((mileage - max_mileage) / 20000) * 3)
+            score += 2
+        recommendation_reason(reasons, "Mileage fits your limit")
 
     if priority == "best_value":
         if average_price and price < average_price:
-            score += min(11, ((average_price - price) / average_price) * 18)
+            score += min(8, ((average_price - price) / average_price) * 16)
             recommendation_reason(reasons, "Strong value versus inventory average")
         if mileage and year:
-            score += max(0, min(7, (year - 2008) * 0.45 - (mileage / 120000)))
+            score += max(0, min(4, (year - 2008) * 0.35 - (mileage / 150000)))
     elif priority == "low_mileage":
-        score += max(0, min(14, 14 - (mileage / 25000)))
+        score += mileage_quality * 8
         recommendation_reason(reasons, "Prioritizes lower mileage")
     elif priority == "newest":
-        score += max(0, min(14, (year - 2010) * 1.2))
+        score += year_quality * 8
         recommendation_reason(reasons, "Prioritizes newer model year")
     elif priority == "lowest_price":
         if average_price and price:
-            score += max(0, min(14, ((average_price - price) / average_price) * 20))
+            score += max(0, min(8, ((average_price - price) / average_price) * 18))
         recommendation_reason(reasons, "Prioritizes lower price")
 
     if not reasons:
         recommendation_reason(reasons, "Balanced match from available inventory")
 
     scored_car = dict(car)
-    scored_car["match_score"] = max(0, min(100, int(round(score))))
+    scored_car["match_score"] = max(35, min(96, int(round(score))))
     scored_car["match_reasons"] = reasons[:4]
     scored_car["budget_gap"] = budget - price if budget else None
     return scored_car
 
 
 def build_personalized_recommendations(args, limit=9):
-    preferences = {
-        "budget": args.get("budget", "").strip(),
-        "category": args.get("category", "").strip(),
-        "brand": args.get("brand", "").strip(),
-        "location": args.get("location", "").strip(),
-        "fuel_type": args.get("fuel_type", "").strip(),
-        "transmission": args.get("transmission", "").strip(),
-        "min_year": args.get("min_year", "").strip(),
-        "max_mileage": args.get("max_mileage", "").strip(),
-        "priority": args.get("priority", "balanced").strip() or "balanced",
-    }
+    preferences = build_recommendation_preferences(args)
     cars = fetch_available_cars()
-    prices = [parse_int(car.get("price"), 0) or 0 for car in cars]
+    matching_cars = [
+        car
+        for car in cars
+        if car_matches_recommendation_preferences(car, preferences)
+    ]
+    prices = [parse_int(car.get("price"), 0) or 0 for car in matching_cars]
     average_price = sum(prices) / len(prices) if prices else 0
     scored_cars = [
         score_recommendation(car, preferences, average_price)
-        for car in cars
+        for car in matching_cars
     ]
     return sorted(
         scored_cars,
@@ -4593,6 +4964,7 @@ def home():
         ORDER BY total DESC, category ASC
         """
     ).fetchall()
+    popular_categories = build_popular_categories(category_counts)
     latest_blogs = conn.execute(
         "SELECT * FROM blogs ORDER BY id DESC LIMIT 3"
     ).fetchall()
@@ -4601,7 +4973,7 @@ def home():
     return render_template(
         "index.html",
         cars=featured_cars,
-        category_counts=category_counts,
+        category_counts=popular_categories,
         featured_categories=search_options["categories"],
         latest_blogs=latest_blogs,
         testimonials=TESTIMONIALS,
@@ -5031,16 +5403,21 @@ def recommendations():
         search_options=fetch_search_options(),
         current_preferences=request.args,
         has_preferences=has_preferences,
+        current_year=datetime.now().year,
     )
 
 
 @app.route("/lead/contact/<int:car_id>", methods=["POST"])
 def contact_seller(car_id):
+    name, email, phone = get_lead_identity()
+    if not all([name, email, phone]):
+        return redirect(f"/login?next=/car/{car_id}")
+
     create_lead(
         car_id,
-        request.form["name"],
-        request.form["email"],
-        request.form["phone"],
+        name,
+        email,
+        phone,
         request.form.get("message", ""),
         "seller",
     )
@@ -5049,15 +5426,19 @@ def contact_seller(car_id):
 
 @app.route("/lead/book/<int:car_id>", methods=["POST"])
 def book_test_drive(car_id):
+    name, email, phone = get_lead_identity()
+    if not all([name, email, phone]):
+        return redirect(f"/login?next=/car/{car_id}")
+
     message = (
         f"Preferred date: {request.form.get('preferred_date', '')} | "
         f"Preferred time: {request.form.get('preferred_time', '')}"
     )
     create_lead(
         car_id,
-        request.form["name"],
-        request.form["email"],
-        request.form["phone"],
+        name,
+        email,
+        phone,
         message,
         "test_drive",
     )
@@ -5067,29 +5448,55 @@ def book_test_drive(car_id):
 @app.route("/login", methods=["GET", "POST"])
 def login():
     error = None
+    buyer_error = None
+    next_url = normalize_next_url(
+        request.form.get("next") or request.args.get("next"),
+        "/",
+    )
 
     if request.method == "POST":
-        username = request.form["username"]
-        conn = get_db()
-        admin = conn.execute(
-            "SELECT * FROM admins WHERE username = ?",
-            (username,),
-        ).fetchone()
-        conn.close()
+        account_type = request.form.get("account_type", "buyer")
 
-        if admin and verify_password(admin["password_hash"], request.form["password"]):
-            session["admin_username"] = admin["username"]
-            return redirect("/admin")
+        if account_type == "buyer":
+            name = request.form.get("name", "")
+            email = request.form.get("email", "")
+            phone = request.form.get("phone", "")
 
-        error = "Invalid username or password."
+            if not all([name.strip(), email.strip(), phone.strip()]):
+                buyer_error = "Please enter your name, email, and phone number."
+            else:
+                save_buyer_profile(name, email, phone)
+                return redirect(next_url)
 
-    return render_template("login.html", error=error)
+        else:
+            username = request.form["username"]
+            conn = get_db()
+            admin = conn.execute(
+                "SELECT * FROM admins WHERE username = ?",
+                (username,),
+            ).fetchone()
+            conn.close()
+
+            if admin and verify_password(admin["password_hash"], request.form["password"]):
+                session.pop("buyer_profile", None)
+                session["admin_username"] = admin["username"]
+                return redirect("/admin")
+
+            error = "Invalid username or password."
+
+    return render_template(
+        "login.html",
+        error=error,
+        buyer_error=buyer_error,
+        next_url=next_url,
+    )
 
 
 @app.route("/logout")
 def logout():
+    next_url = normalize_next_url(request.args.get("next"), "/")
     session.clear()
-    return redirect("/")
+    return redirect(next_url)
 
 
 @app.route("/admin")
@@ -5098,14 +5505,28 @@ def admin():
         return redirect("/login")
 
     conn = get_db()
-    all_cars = conn.execute("SELECT * FROM cars ORDER BY id DESC").fetchall()
+    all_cars = conn.execute(
+        """
+        SELECT *
+        FROM cars
+        ORDER BY
+            CASE COALESCE(status, 'Available')
+                WHEN 'Pending Review' THEN 0
+                WHEN 'Available' THEN 1
+                WHEN 'Sold' THEN 2
+                WHEN 'Archived' THEN 3
+                ELSE 4
+            END,
+            id DESC
+        """
+    ).fetchall()
     recent_leads = conn.execute(
         """
         SELECT leads.*, cars.title AS car_title
         FROM leads
         LEFT JOIN cars ON cars.id = leads.car_id
         ORDER BY leads.id DESC
-        LIMIT 12
+        LIMIT 15
         """
     ).fetchall()
     conn.close()
@@ -5114,7 +5535,7 @@ def admin():
         "admin_dashboard.html",
         cars=all_cars,
         leads=recent_leads,
-        stats=fetch_stats(),
+        admin_stats=fetch_admin_stats(),
         app_name=APP_NAME,
     )
 

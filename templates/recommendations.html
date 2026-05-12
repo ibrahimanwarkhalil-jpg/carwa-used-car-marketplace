@@ -15,7 +15,16 @@
 
 <form action="/recommendations" method="GET" class="filter-form">
 <label>Budget (AED)</label>
-<input name="budget" type="number" min="0" class="form-control" value="{{ current_preferences.get('budget', '') }}" placeholder="35000">
+<select name="budget" class="form-control">
+{% set selected_budget = current_preferences.get("budget", "") %}
+<option value="" {% if not selected_budget %}selected{% endif %}>Any Budget</option>
+<option value="20000" {% if selected_budget == "20000" %}selected{% endif %}>Under AED 20,000</option>
+<option value="40000" {% if selected_budget == "40000" %}selected{% endif %}>AED 20,000 - 40,000</option>
+<option value="60000" {% if selected_budget == "60000" %}selected{% endif %}>AED 40,000 - 60,000</option>
+<option value="80000" {% if selected_budget == "80000" %}selected{% endif %}>AED 60,000 - 80,000</option>
+<option value="100000" {% if selected_budget == "100000" %}selected{% endif %}>AED 80,000 - 100,000</option>
+<option value="999999" {% if selected_budget == "999999" %}selected{% endif %}>AED 100,000+</option>
+</select>
 
 <label>Body Type</label>
 <select name="category" class="form-control">
@@ -43,25 +52,34 @@
 
 <label>Fuel Type</label>
 <select name="fuel_type" class="form-control">
-<option value="">Any Fuel Type</option>
-{% for fuel_type in search_options.fuel_types %}
-<option value="{{ fuel_type }}" {% if current_preferences.get("fuel_type") == fuel_type %}selected{% endif %}>{{ fuel_type }}</option>
-{% endfor %}
+{% set selected_fuel_type = current_preferences.get("fuel_type", "Petrol") or "Petrol" %}
+<option value="Petrol" {% if selected_fuel_type == "Petrol" %}selected{% endif %}>Petrol</option>
 </select>
 
 <label>Transmission</label>
 <select name="transmission" class="form-control">
-<option value="">Any Transmission</option>
-{% for transmission in search_options.transmissions %}
-<option value="{{ transmission }}" {% if current_preferences.get("transmission") == transmission %}selected{% endif %}>{{ transmission }}</option>
-{% endfor %}
+{% set selected_transmission = current_preferences.get("transmission", "Automatic") or "Automatic" %}
+<option value="Automatic" {% if selected_transmission == "Automatic" %}selected{% endif %}>Automatic</option>
 </select>
 
 <label>Minimum Year</label>
-<input name="min_year" type="number" min="1980" class="form-control" value="{{ current_preferences.get('min_year', '') }}" placeholder="2015">
+<select name="min_year" class="form-control">
+{% set selected_min_year = current_preferences.get("min_year", "") %}
+<option value="" {% if not selected_min_year %}selected{% endif %}>Any Year</option>
+{% for year in range(current_year + 1, 1979, -1) %}
+<option value="{{ year }}" {% if selected_min_year == year|string %}selected{% endif %}>{{ year }} or newer</option>
+{% endfor %}
+</select>
 
 <label>Maximum Mileage</label>
-<input name="max_mileage" type="number" min="0" class="form-control" value="{{ current_preferences.get('max_mileage', '') }}" placeholder="180000">
+<select name="max_mileage" class="form-control">
+{% set selected_max_mileage = current_preferences.get("max_mileage", "") %}
+<option value="" {% if not selected_max_mileage %}selected{% endif %}>Any Mileage</option>
+<option value="50000" {% if selected_max_mileage == "50000" %}selected{% endif %}>Under 50,000 km</option>
+<option value="100000" {% if selected_max_mileage == "100000" %}selected{% endif %}>Up to 100,000 km</option>
+<option value="200000" {% if selected_max_mileage == "200000" %}selected{% endif %}>Up to 200,000 km</option>
+<option value="999999" {% if selected_max_mileage == "999999" %}selected{% endif %}>200,000 km and above</option>
+</select>
 
 <label>Priority</label>
 <select name="priority" class="form-control">
@@ -95,7 +113,7 @@
 <div class="car-image-wrap">
 <img src="/static/uploads/{{ car.image }}" class="card-img-top" alt="{{ car.title }}">
 {% if has_preferences %}
-<span class="recommendation-score">{{ car.match_score }}%</span>
+<span class="recommendation-score" title="Weighted match from selected preferences, price, year, mileage, and value">{{ car.match_score }}%</span>
 {% else %}
 <span class="recommendation-score recommendation-score-static">Top Pick</span>
 {% endif %}

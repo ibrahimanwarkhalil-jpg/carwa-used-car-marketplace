@@ -6,6 +6,8 @@ __pycache__
 *.pyc
 *.pyo
 *.log
+static/uploads/**/*.HEIC.png
+static/uploads/**/*.heic.png
 
 # Unused duplicate HEIC originals. The app/database references JPG or PNG versions instead.
 static/uploads/altima_2007/altima2007_1.HEIC

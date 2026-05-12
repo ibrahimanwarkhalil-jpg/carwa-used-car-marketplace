@@ -23,6 +23,7 @@
 <div class="search-grid" data-search-bar>
 <div class="search-field">
 <label>Category</label>
+<div class="search-select-wrap">
 <select name="category" class="form-control search-select">
 <option value="">All</option>
 {% for category in search_options.categories %}
@@ -30,9 +31,11 @@
 {% endfor %}
 </select>
 </div>
+</div>
 
 <div class="search-field">
 <label>Location</label>
+<div class="search-select-wrap">
 <select name="location" class="form-control search-select">
 <option value="">All</option>
 {% for location in search_options.locations %}
@@ -40,9 +43,11 @@
 {% endfor %}
 </select>
 </div>
+</div>
 
 <div class="search-field">
 <label>Brand</label>
+<div class="search-select-wrap">
 <select name="brand" class="form-control search-select">
 <option value="">All</option>
 {% for brand in search_options.brands %}
@@ -50,20 +55,28 @@
 {% endfor %}
 </select>
 </div>
+</div>
 
 <div class="search-field">
 <label>Model</label>
-<input class="form-control search-input" value="All" readonly>
+<div class="search-select-wrap">
+<select name="model" class="form-control search-select">
+<option value="">All</option>
+{% for model in search_options.models %}
+<option value="{{ model }}">{{ model }}</option>
+{% endfor %}
+</select>
+</div>
 </div>
 
 <div class="search-field search-field-price">
 <div class="search-field-price-inner">
-<div class="price-range-card" data-price-floor="{{ search_options.price_floor }}" data-price-ceiling="{{ search_options.price_ceiling }}">
+<div class="price-range-card" data-price-floor="{{ search_options.price_slider_floor }}" data-price-ceiling="{{ search_options.price_ceiling }}" data-price-min-gap="1000">
 <label class="mb-0">Price in AED</label>
 <div class="range-shell">
 <div class="range-progress" data-price-progress></div>
-<div class="range-start-thumb" aria-hidden="true"></div>
-<input type="range" min="{{ search_options.price_floor }}" max="{{ search_options.price_ceiling }}" step="1000" value="{{ search_options.price_ceiling }}" data-price-max aria-label="Maximum price in AED">
+<input type="range" class="price-range-min" min="{{ search_options.price_slider_floor }}" max="{{ search_options.price_ceiling }}" step="1000" value="{{ search_options.price_floor }}" data-price-min aria-label="Minimum price in AED">
+<input type="range" class="price-range-max" min="{{ search_options.price_slider_floor }}" max="{{ search_options.price_ceiling }}" step="1000" value="{{ search_options.price_ceiling }}" data-price-max aria-label="Maximum price in AED">
 </div>
 <div class="price-range-text">
 <span data-price-min-display>{{ "{:,}".format(search_options.price_floor) }}</span>
@@ -82,11 +95,11 @@
 </form>
 
 <div class="hero-tool-links">
-<a href="/recommendations" class="btn btn-dark">
+<a href="/recommendations" class="btn hero-tool-button">
 <i class="fa-solid fa-wand-magic-sparkles"></i>
 Get Recommendations
 </a>
-<a href="/evaluate" class="btn btn-outline-dark">
+<a href="/evaluate" class="btn hero-tool-button">
 <i class="fa-solid fa-calculator"></i>
 Evaluate Price
 </a>
@@ -121,19 +134,40 @@ Evaluate Price
 </div>
 </section>
 
-<section class="container section-space">
-<div class="section-head">
-<p class="eyebrow">Explore Popular Categories</p>
-<h2>Browse By Body Type</h2>
+<section class="popular-category-band">
+<div class="container popular-category-layout">
+<div class="popular-category-copy">
+<p class="eyebrow">Browse By Body Type</p>
+<h2>Explore Popular Categories</h2>
+<div class="popular-category-controls">
+<button type="button" class="category-nav-button" data-category-prev aria-label="Previous categories">
+<i class="fa-solid fa-chevron-left"></i>
+</button>
+<button type="button" class="category-nav-button" data-category-next aria-label="Next categories">
+<i class="fa-solid fa-chevron-right"></i>
+</button>
+</div>
 </div>
 
-<div class="category-grid">
+<div class="popular-category-carousel" data-category-carousel>
+<div class="popular-category-track">
 {% for category in category_counts %}
-<a href="/cars?category={{ category.category }}" class="category-card">
+<a href="/cars?category={{ category.category }}" class="category-showcase-card">
+<span class="category-showcase-head">
 <span>{{ category.category }}</span>
-<strong>{{ category.total }} Cars</strong>
+<strong>({{ category.total }})</strong>
+</span>
+<span class="category-showcase-body">
+{% if category.image %}
+<img src="/static/{{ category.image }}" class="category-image category-image-{{ category.category|lower|replace(' ', '-') }}" alt="{{ category.category }} icon">
+{% else %}
+<i class="{{ category.icon_class }}"></i>
+{% endif %}
+</span>
 </a>
 {% endfor %}
+</div>
+</div>
 </div>
 </section>
 
@@ -194,32 +228,92 @@ Evaluate Price
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  const categoryCarousel = document.querySelector("[data-category-carousel]");
+  const categoryPrev = document.querySelector("[data-category-prev]");
+  const categoryNext = document.querySelector("[data-category-next]");
+
+  if (categoryCarousel) {
+    function moveCategories(direction) {
+      const firstCard = categoryCarousel.querySelector(".category-showcase-card");
+      const track = categoryCarousel.querySelector(".popular-category-track");
+      const gap = track ? parseFloat(window.getComputedStyle(track).columnGap || "0") : 0;
+      const amount = firstCard ? firstCard.getBoundingClientRect().width + gap : Math.max(categoryCarousel.clientWidth * 0.72, 320);
+      const maxScroll = categoryCarousel.scrollWidth - categoryCarousel.clientWidth;
+      const nextPosition = categoryCarousel.scrollLeft + (direction * amount);
+      const atStart = categoryCarousel.scrollLeft <= 4;
+      const atEnd = categoryCarousel.scrollLeft >= maxScroll - 4;
+      let targetPosition = nextPosition;
+
+      if (direction < 0 && atStart) {
+        targetPosition = maxScroll;
+      } else if (direction > 0 && atEnd) {
+        targetPosition = 0;
+      } else if (nextPosition < 0) {
+        targetPosition = maxScroll;
+      } else if (nextPosition > maxScroll) {
+        targetPosition = 0;
+      }
+
+      categoryCarousel.scrollTo({
+        left: targetPosition,
+        behavior: "smooth"
+      });
+    }
+
+    if (categoryPrev) {
+      categoryPrev.addEventListener("click", function () {
+        moveCategories(-1);
+      });
+    }
+
+    if (categoryNext) {
+      categoryNext.addEventListener("click", function () {
+        moveCategories(1);
+      });
+    }
+  }
+
   const priceCard = document.querySelector(".price-range-card");
   if (priceCard) {
+    const minInput = priceCard.querySelector("[data-price-min]");
     const maxInput = priceCard.querySelector("[data-price-max]");
     const minField = priceCard.querySelector("[data-price-min-field]");
     const maxField = priceCard.querySelector("[data-price-max-field]");
     const minDisplay = priceCard.querySelector("[data-price-min-display]");
     const maxDisplay = priceCard.querySelector("[data-price-max-display]");
     const progress = priceCard.querySelector("[data-price-progress]");
+    const minGap = Number(priceCard.dataset.priceMinGap || "1000");
 
     function formatPrice(value) {
       return Number(value).toLocaleString();
     }
 
     function syncPriceInputs() {
-      const minValue = Number(minField.value);
+      const minValue = Number(minInput.value);
       const maxValue = Number(maxInput.value);
       const range = Number(maxInput.max) - Number(maxInput.min);
-      const percent = range > 0 ? ((maxValue - Number(maxInput.min)) / range) * 100 : 100;
+      const leftPercent = range > 0 ? ((minValue - Number(minInput.min)) / range) * 100 : 0;
+      const rightPercent = range > 0 ? 100 - ((maxValue - Number(maxInput.min)) / range) * 100 : 0;
 
+      minField.value = String(minValue);
       maxField.value = String(maxValue);
       minDisplay.textContent = formatPrice(minValue);
       maxDisplay.textContent = formatPrice(maxValue);
-      progress.style.width = percent + "%";
+      progress.style.left = leftPercent + "%";
+      progress.style.right = rightPercent + "%";
     }
 
+    minInput.addEventListener("input", function () {
+      if (Number(minInput.value) > Number(maxInput.value) - minGap) {
+        minInput.value = String(Number(maxInput.value) - minGap);
+      }
+      syncPriceInputs();
+    });
+
     maxInput.addEventListener("input", function () {
+      if (Number(maxInput.value) < Number(minInput.value) + minGap) {
+        maxInput.value = String(Number(minInput.value) + minGap);
+      }
       syncPriceInputs();
     });
 

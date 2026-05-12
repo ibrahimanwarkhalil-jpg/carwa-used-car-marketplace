@@ -5,6 +5,7 @@
 
 <title>{{ app_name }}</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/static/uploads/logo/logo.png" type="image/png">
 <script>
 (function () {
   var savedTheme = localStorage.getItem("carwa-theme");
@@ -18,11 +19,13 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 
-<link rel="stylesheet" href="/static/css/style.css?v=8">
+<link rel="stylesheet" href="/static/css/style.css?v=34">
 
 </head>
 
-<body>
+{% set is_admin_context = session.get("admin_username") and request.path.startswith("/admin") %}
+
+<body class="{{ 'admin-context' if is_admin_context else '' }}">
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm site-navbar">
 
@@ -30,7 +33,8 @@
 
 <!-- LOGO -->
 
-<a class="navbar-brand fw-bold site-logo" href="/">
+<a class="navbar-brand fw-bold site-logo" href="{{ '/admin' if is_admin_context else '/' }}">
+<img src="/static/uploads/logo/logo.png" class="site-logo-img" alt="" aria-hidden="true">
 <span class="site-logo-mark">{{ app_name }}</span>
 </a>
 
@@ -38,6 +42,19 @@
 
 <ul class="navbar-nav nav-main">
 
+{% if is_admin_context %}
+<li class="nav-item">
+<a class="nav-link" href="/admin">Dashboard</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="/add">Add Listing</a>
+</li>
+
+<li class="nav-item">
+<a class="nav-link" href="/cars">View Website</a>
+</li>
+{% else %}
 <li class="nav-item">
 <a class="nav-link" href="/">Home</a>
 </li>
@@ -77,43 +94,67 @@
 <li class="nav-item">
 <a class="nav-link" href="/finance">Finance</a>
 </li>
+{% endif %}
 
 </ul>
 
 <!-- RIGHT BUTTONS -->
 
 <div class="nav-actions">
+<div class="nav-action-group nav-account-group">
 
 {% if session.get("admin_username") %}
-<a href="/admin" class="btn btn-outline-dark">
+<span class="nav-profile-pill">
+{{ session.get("admin_username") }}
+</span>
+
+{% if not is_admin_context %}
+<a href="/admin" class="btn btn-outline-dark nav-pill-button">
 Admin
 </a>
+{% endif %}
 
-<a href="/logout" class="btn btn-outline-secondary">
+<a href="/logout" class="btn btn-outline-secondary nav-pill-button">
+Logout
+</a>
+{% elif session.get("buyer_profile") %}
+<span class="nav-profile-pill">
+{{ session.get("buyer_profile").name }}
+</span>
+
+<a href="/logout" class="btn btn-outline-secondary nav-pill-button">
 Logout
 </a>
 {% else %}
-<a href="/login" class="btn btn-outline-dark">
+<a href="/login?next={{ request.path }}" class="btn btn-outline-dark nav-pill-button">
 Login
 </a>
 {% endif %}
 
-<button type="button" class="btn btn-outline-secondary theme-toggle" data-theme-toggle aria-label="Switch color theme">
+<button type="button" class="btn btn-outline-secondary theme-toggle nav-pill-button" data-theme-toggle aria-label="Switch color theme">
 <i class="fa-solid fa-moon" data-theme-icon></i>
 <span data-theme-label>Dark</span>
 </button>
+</div>
 
-<a href="/cars" class="btn btn-primary">
-I am Buyer
+{% if not is_admin_context %}
+<div class="nav-action-group nav-cta-group">
+<a href="/cars" class="btn btn-primary nav-pill-button">
+<i class="fa-solid fa-car-side"></i>
+Buy
 </a>
 
-<a href="/add" class="btn btn-dark">
-Sell My Car
+<a href="/add" class="btn btn-dark nav-pill-button">
+<i class="fa-solid fa-tag"></i>
+Sell
 </a>
 
-<a href="/evaluate" class="btn btn-outline-primary">
-Evaluate My Car
+<a href="/evaluate" class="btn btn-outline-primary nav-pill-button">
+<i class="fa-solid fa-calculator"></i>
+Evaluate
 </a>
+</div>
+{% endif %}
 
 </div>
 
@@ -126,6 +167,7 @@ Evaluate My Car
 
 {% block content %}{% endblock %}
 
+{% if not is_admin_context %}
 <footer class="site-footer">
 <div class="container footer-inner">
 <div>
@@ -133,10 +175,12 @@ Evaluate My Car
 </div>
 </div>
 </footer>
+{% endif %}
 
 
 <!-- WHATSAPP BUTTON -->
 
+{% if not is_admin_context %}
 <div class="whatsapp-wrap">
 <div class="whatsapp-tooltip">
 <strong>Hi, there!</strong>
@@ -146,6 +190,7 @@ Evaluate My Car
 <i class="fab fa-whatsapp"></i>
 </a>
 </div>
+{% endif %}
 
 
 <!-- SCRIPTS -->

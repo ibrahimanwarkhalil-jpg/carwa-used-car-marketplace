@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="row g-4 inventory-layout">
+
+<div class="col-lg-3">
+<div class="filter-card sticky-side-panel">
+<div class="inventory-filter-head">
+<p class="eyebrow">All Vehicles</p>
+<h3>Refine Search</h3>
+</div>
+<form action="/cars" method="GET" class="filter-form">
+<label>Category</label>
+<select name="category" class="form-control">
+<option value="">Any Category</option>
+{% for category in search_options.categories %}
+<option value="{{ category }}" {% if current_filters.get("category") == category %}selected{% endif %}>{{ category }}</option>
+{% endfor %}
+</select>
+
+<label>Location</label>
+<select name="location" class="form-control">
+<option value="">Any Location</option>
+{% for location in search_options.locations %}
+<option value="{{ location }}" {% if current_filters.get("location") == location %}selected{% endif %}>{{ location }}</option>
+{% endfor %}
+</select>
+
+<label>Search By Location</label>
+<input name="location_query" class="form-control" value="{{ current_filters.get('location_query', '') }}" placeholder="Dubai, Sharjah, Abu Dhabi">
+
+<label>Brand</label>
+<select name="brand" class="form-control">
+<option value="">Any Brand</option>
+{% for brand in search_options.brands %}
+<option value="{{ brand }}" {% if current_filters.get("brand") == brand %}selected{% endif %}>{{ brand }}</option>
+{% endfor %}
+</select>
+
+<label>Model</label>
+<input class="form-control" value="All" readonly>
+
+<label>Year</label>
+<input name="year" class="form-control" value="{{ current_filters.get('year', '') }}" placeholder="2020">
+
+<label>Price Range (AED)</label>
+<div class="price-input-grid">
+<input name="min_price" class="form-control" value="{{ current_filters.get('min_price', '') }}" placeholder="5000">
+<input name="max_price" class="form-control" value="{{ current_filters.get('max_price', current_filters.get('price', '')) }}" placeholder="{{ search_options.price_ceiling }}">
+</div>
+
+<label>Fuel Type</label>
+<select name="fuel_type" class="form-control">
+<option value="">Any Fuel Type</option>
+{% for fuel_type in search_options.fuel_types %}
+<option value="{{ fuel_type }}" {% if current_filters.get("fuel_type") == fuel_type %}selected{% endif %}>{{ fuel_type }}</option>
+{% endfor %}
+</select>
+
+<label>Transmission</label>
+<select name="transmission" class="form-control">
+<option value="">Any Transmission</option>
+{% for transmission in search_options.transmissions %}
+<option value="{{ transmission }}" {% if current_filters.get("transmission") == transmission %}selected{% endif %}>{{ transmission }}</option>
+{% endfor %}
+</select>
+
+<label>Condition</label>
+<select name="condition" class="form-control">
+<option value="">Any Condition</option>
+{% for condition in search_options.conditions %}
+<option value="{{ condition }}" {% if current_filters.get("condition") == condition %}selected{% endif %}>{{ condition }}</option>
+{% endfor %}
+</select>
+
+<label>Sort By</label>
+<select name="sort" class="form-control">
+<option value="">Featured First</option>
+<option value="latest" {% if current_filters.get("sort") == "latest" %}selected{% endif %}>Latest</option>
+<option value="price_low" {% if current_filters.get("sort") == "price_low" %}selected{% endif %}>Price Low to High</option>
+<option value="price_high" {% if current_filters.get("sort") == "price_high" %}selected{% endif %}>Price High to Low</option>
+<option value="year_new" {% if current_filters.get("sort") == "year_new" %}selected{% endif %}>Newest Year</option>
+<option value="year_old" {% if current_filters.get("sort") == "year_old" %}selected{% endif %}>Oldest Year</option>
+<option value="mileage_low" {% if current_filters.get("sort") == "mileage_low" %}selected{% endif %}>Lowest Mileage</option>
+</select>
+
+<button class="btn btn-dark mt-3 w-100">Apply Filters</button>
+<a href="/cars" class="btn btn-outline-secondary mt-2 w-100">Reset</a>
+</form>
+</div>
+</div>
+
+<div class="col-lg-9">
+<div class="section-head section-head-inline inventory-head">
+<div>
+<p class="eyebrow">All Vehicles</p>
+<h2>Available Cars</h2>
+</div>
+<p class="results-count">{{ pagination.total_results }} listings found</p>
+</div>
+
+{% if cars %}
+<div class="row g-4">
+{% for car in cars %}
+<div class="col-md-6">
+<div class="card car-card h-100" data-card-link="/car/{{ car.id }}" tabindex="0" role="link" aria-label="Open {{ car.title }}">
+<div class="car-image-wrap featured-rotator listing-rotator" data-images='{{ car.listing_images | tojson }}'>
+<img src="/static/uploads/{{ car.image }}" class="card-img-top featured-rotator-image" alt="{{ car.title }}">
+{% if car.listing_images|length > 1 %}
+<button type="button" class="featured-rotator-button featured-rotator-prev" aria-label="Show previous picture">
+&lsaquo;
+</button>
+<button type="button" class="featured-rotator-button featured-rotator-next" aria-label="Show next picture">
+&rsaquo;
+</button>
+{% endif %}
+</div>
+<div class="card-body">
+<div class="car-meta-top">
+<span class="car-chip">{{ car.category }}</span>
+<span class="car-chip">{{ car.location }}</span>
+<span class="car-chip">{{ car.condition }}</span>
+</div>
+<h5>{{ car.title }}</h5>
+<p class="car-specs">{{ car.year }} | {{ "{:,}".format(car.mileage) }} km | {{ car.fuel_type }} | {{ car.transmission }}</p>
+<p class="car-description">{{ car.description }}</p>
+<div class="car-card-footer">
+<strong>AED {{ "{:,}".format(car.price) }}</strong>
+<div class="card-actions">
+<a href="/car/{{ car.id }}" class="btn btn-dark">View</a>
+<a href="/wishlist/{{ car.id }}" class="btn btn-outline-danger">Save</a>
+<a href="/compare?car1={{ car.id }}" class="btn btn-outline-secondary">Compare</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+<h4>No cars matched those filters</h4>
+<p>Try removing a filter or resetting the search to see the full marketplace inventory.</p>
+<a href="/cars" class="btn btn-dark">Show All Cars</a>
+</div>
+{% endif %}
+
+{% if pagination.total_pages > 1 %}
+<div class="pagination-bar">
+<span class="results-count">Page {{ pagination.page }} of {{ pagination.total_pages }}</span>
+<div class="card-actions">
+{% if pagination.has_prev %}
+<a href="{{ pagination.prev_url }}" class="btn btn-outline-secondary">Previous</a>
+{% endif %}
+{% if pagination.has_next %}
+<a href="{{ pagination.next_url }}" class="btn btn-dark">Next</a>
+{% endif %}
+</div>
+</div>
+{% endif %}
+</div>
+
+</div>
+</div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const rotators = document.querySelectorAll(".listing-rotator");
+
+  rotators.forEach(function (rotator) {
+    const imageEl = rotator.querySelector(".featured-rotator-image");
+    const prevButton = rotator.querySelector(".featured-rotator-prev");
+    const nextButton = rotator.querySelector(".featured-rotator-next");
+    const images = JSON.parse(rotator.dataset.images || "[]");
+    let currentIndex = 0;
+
+    if (!imageEl || images.length <= 1) {
+      return;
+    }
+
+    function showImage(index) {
+      currentIndex = (index + images.length) % images.length;
+      imageEl.src = "/static/uploads/" + images[currentIndex];
+    }
+
+    if (prevButton) {
+      prevButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        showImage(currentIndex - 1);
+      });
+    }
+
+    if (nextButton) {
+      nextButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        showImage(currentIndex + 1);
+      });
+    }
+  });
+});
+</script>
+
+{% endblock %}

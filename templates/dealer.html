@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="section-head">
+<p class="eyebrow">Dealer Profile</p>
+<h2>Your Dealership Inventory</h2>
+</div>
+
+<div class="highlight-band dealer-panel mb-4">
+<div class="container">
+<div class="highlight-grid">
+<div>
+<h3>Trusted Used Cars Across The UAE</h3>
+<p>Dealer-style inventory works directly through the same listing flow as customers, so you can publish your own stock without a separate backend process.</p>
+</div>
+<div class="highlight-cards">
+<div class="mini-feature">
+<strong>{{ stats.total_cars }}</strong>
+<span>Total listed vehicles</span>
+</div>
+<div class="mini-feature">
+<strong>{{ stats.featured_cars }}</strong>
+<span>Featured units</span>
+</div>
+<div class="mini-feature">
+<strong>{{ stats.brand_count }}</strong>
+<span>Brands available</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="row g-4">
+{% for car in cars %}
+<div class="col-lg-4 col-md-6">
+<div class="card car-card h-100" data-card-link="/car/{{ car.id }}" tabindex="0" role="link" aria-label="Open {{ car.title }}">
+<div class="car-image-wrap">
+<img src="/static/uploads/{{ car.image }}" class="card-img-top" alt="{{ car.title }}">
+</div>
+<div class="card-body">
+<div class="car-meta-top">
+<span class="car-chip">{{ car.category }}</span>
+<span class="car-chip">{{ car.location }}</span>
+</div>
+<h5>{{ car.title }}</h5>
+<p class="car-specs">{{ car.year }} | {{ "{:,}".format(car.mileage) }} km | {{ car.transmission }}</p>
+<p class="results-count">{{ car.seller_name }}</p>
+<div class="car-card-footer">
+<strong>AED {{ "{:,}".format(car.price) }}</strong>
+<a href="/car/{{ car.id }}" class="btn btn-outline-dark">View</a>
+</div>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+</div>
+</section>
+
+{% endblock %}

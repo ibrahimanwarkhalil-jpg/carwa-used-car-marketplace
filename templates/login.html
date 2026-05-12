@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="form-shell admin-login-shell">
+<div class="section-head">
+<p class="eyebrow">Admin Access</p>
+<h2>Login</h2>
+</div>
+
+<div class="image-help mb-4">
+Default admin login:
+<br>
+<code>username: admin</code>
+<br>
+<code>password: carwa123</code>
+</div>
+
+{% if error %}
+<div class="image-help mb-4">
+{{ error }}
+</div>
+{% endif %}
+
+<form method="POST" class="row g-3">
+<div class="col-12">
+<label>Username</label>
+<input class="form-control" name="username" required>
+</div>
+
+<div class="col-12">
+<label>Password</label>
+<input class="form-control" type="password" name="password" required>
+</div>
+
+<div class="col-12">
+<button class="btn btn-dark w-100">Login</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+
+{% endblock %}

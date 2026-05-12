@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="row g-4 inventory-layout">
+
+<div class="col-lg-3">
+<div class="filter-card sticky-side-panel">
+<div class="inventory-filter-head">
+<p class="eyebrow">Personalized</p>
+<h3>Preferences</h3>
+</div>
+
+<form action="/recommendations" method="GET" class="filter-form">
+<label>Budget (AED)</label>
+<input name="budget" type="number" min="0" class="form-control" value="{{ current_preferences.get('budget', '') }}" placeholder="35000">
+
+<label>Body Type</label>
+<select name="category" class="form-control">
+<option value="">Any Category</option>
+{% for category in search_options.categories %}
+<option value="{{ category }}" {% if current_preferences.get("category") == category %}selected{% endif %}>{{ category }}</option>
+{% endfor %}
+</select>
+
+<label>Brand</label>
+<select name="brand" class="form-control">
+<option value="">Any Brand</option>
+{% for brand in search_options.brands %}
+<option value="{{ brand }}" {% if current_preferences.get("brand") == brand %}selected{% endif %}>{{ brand }}</option>
+{% endfor %}
+</select>
+
+<label>Location</label>
+<select name="location" class="form-control">
+<option value="">Any Location</option>
+{% for location in search_options.locations %}
+<option value="{{ location }}" {% if current_preferences.get("location") == location %}selected{% endif %}>{{ location }}</option>
+{% endfor %}
+</select>
+
+<label>Fuel Type</label>
+<select name="fuel_type" class="form-control">
+<option value="">Any Fuel Type</option>
+{% for fuel_type in search_options.fuel_types %}
+<option value="{{ fuel_type }}" {% if current_preferences.get("fuel_type") == fuel_type %}selected{% endif %}>{{ fuel_type }}</option>
+{% endfor %}
+</select>
+
+<label>Transmission</label>
+<select name="transmission" class="form-control">
+<option value="">Any Transmission</option>
+{% for transmission in search_options.transmissions %}
+<option value="{{ transmission }}" {% if current_preferences.get("transmission") == transmission %}selected{% endif %}>{{ transmission }}</option>
+{% endfor %}
+</select>
+
+<label>Minimum Year</label>
+<input name="min_year" type="number" min="1980" class="form-control" value="{{ current_preferences.get('min_year', '') }}" placeholder="2015">
+
+<label>Maximum Mileage</label>
+<input name="max_mileage" type="number" min="0" class="form-control" value="{{ current_preferences.get('max_mileage', '') }}" placeholder="180000">
+
+<label>Priority</label>
+<select name="priority" class="form-control">
+<option value="balanced" {% if current_preferences.get("priority", "balanced") == "balanced" %}selected{% endif %}>Balanced Fit</option>
+<option value="best_value" {% if current_preferences.get("priority") == "best_value" %}selected{% endif %}>Best Value</option>
+<option value="low_mileage" {% if current_preferences.get("priority") == "low_mileage" %}selected{% endif %}>Low Mileage</option>
+<option value="newest" {% if current_preferences.get("priority") == "newest" %}selected{% endif %}>Newest Year</option>
+<option value="lowest_price" {% if current_preferences.get("priority") == "lowest_price" %}selected{% endif %}>Lowest Price</option>
+</select>
+
+<button class="btn btn-dark mt-3 w-100">Update Matches</button>
+<a href="/recommendations" class="btn btn-outline-secondary mt-2 w-100">Reset</a>
+</form>
+</div>
+</div>
+
+<div class="col-lg-9">
+<div class="section-head section-head-inline inventory-head">
+<div>
+<p class="eyebrow">{% if has_preferences %}Your Matches{% else %}Marketplace Picks{% endif %}</p>
+<h2>{% if has_preferences %}Personalized Recommendations{% else %}Recommended Inventory{% endif %}</h2>
+</div>
+<a href="/evaluate" class="btn btn-outline-dark">Evaluate Price</a>
+</div>
+
+{% if recommendations %}
+<div class="row g-4">
+{% for car in recommendations %}
+<div class="col-md-6 col-xl-4">
+<div class="card car-card recommendation-card h-100" data-card-link="/car/{{ car.id }}" tabindex="0" role="link" aria-label="Open {{ car.title }}">
+<div class="car-image-wrap">
+<img src="/static/uploads/{{ car.image }}" class="card-img-top" alt="{{ car.title }}">
+{% if has_preferences %}
+<span class="recommendation-score">{{ car.match_score }}%</span>
+{% else %}
+<span class="recommendation-score recommendation-score-static">Top Pick</span>
+{% endif %}
+</div>
+<div class="card-body">
+<div class="car-meta-top">
+<span class="car-chip">{{ car.category }}</span>
+<span class="car-chip">{{ car.location }}</span>
+</div>
+<h5>{{ car.title }}</h5>
+<p class="car-specs">{{ car.year }} | {{ "{:,}".format(car.mileage) }} km | {{ car.fuel_type }} | {{ car.transmission }}</p>
+<ul class="recommendation-reasons">
+{% for reason in car.match_reasons %}
+<li>{{ reason }}</li>
+{% endfor %}
+</ul>
+<div class="car-card-footer">
+<strong>AED {{ "{:,}".format(car.price) }}</strong>
+<div class="card-actions">
+<a href="/car/{{ car.id }}" class="btn btn-dark">View</a>
+<a href="/finance?car_id={{ car.id }}" class="btn btn-outline-primary">Finance</a>
+</div>
+</div>
+{% if car.budget_gap is not none %}
+<p class="budget-note">
+{% if car.budget_gap >= 0 %}
+AED {{ "{:,}".format(car.budget_gap) }} under budget
+{% else %}
+AED {{ "{:,}".format(-car.budget_gap) }} over budget
+{% endif %}
+</p>
+{% endif %}
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+<h4>No recommendations found</h4>
+<p>Try widening your budget, year, mileage, or body type preferences.</p>
+</div>
+{% endif %}
+</div>
+
+</div>
+</div>
+</section>
+
+{% endblock %}

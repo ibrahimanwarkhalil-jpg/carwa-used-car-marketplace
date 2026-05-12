@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="row g-4 align-items-start">
+<div class="col-lg-8">
+<div class="form-shell">
+<div class="section-head">
+<p class="eyebrow">Seller Center</p>
+<h2>List Your Car</h2>
+</div>
+
+<div class="image-help mb-4">
+<strong>Main image:</strong> the file you choose in "Main Image" becomes the current listing picture.
+<br>
+<strong>More pictures:</strong> use "Gallery Images" to add extra photos for the same car.
+<br>
+<strong>Change the current picture later:</strong> open the car and click "Edit Pictures".
+<br>
+<strong>Approval flow:</strong> new listings now enter CARWA as <b>Pending Review</b> until an admin marks them available.
+</div>
+
+<form method="POST" enctype="multipart/form-data" class="row g-3">
+<div class="col-md-6">
+<label>Listing Title</label>
+<input name="title" class="form-control" placeholder="2019 Toyota Camry LE" required>
+</div>
+
+<div class="col-md-3">
+<label>Brand</label>
+<input name="brand" class="form-control" placeholder="Toyota" required>
+</div>
+
+<div class="col-md-3">
+<label>Model</label>
+<input name="model" class="form-control" placeholder="Camry" required>
+</div>
+
+<div class="col-md-3">
+<label>Year</label>
+<input name="year" type="number" class="form-control" placeholder="2020" required>
+</div>
+
+<div class="col-md-3">
+<label>Mileage</label>
+<input name="mileage" type="number" class="form-control" placeholder="65000" required>
+</div>
+
+<div class="col-md-3">
+<label>Price</label>
+<input name="price" type="number" class="form-control" placeholder="85000" required>
+</div>
+
+<div class="col-md-3">
+<label>Location</label>
+<select name="location" class="form-control">
+{% for location in search_options.locations %}
+<option value="{{ location }}">{{ location }}</option>
+{% endfor %}
+<option value="Fujairah">Fujairah</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label>Category</label>
+<select name="category" class="form-control">
+{% for category in search_options.categories %}
+<option value="{{ category }}">{{ category }}</option>
+{% endfor %}
+<option value="SUV">SUV</option>
+<option value="Coupe">Coupe</option>
+<option value="Hatchback">Hatchback</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label>Fuel Type</label>
+<select name="fuel_type" class="form-control">
+<option value="Petrol">Petrol</option>
+<option value="Diesel">Diesel</option>
+<option value="Hybrid">Hybrid</option>
+<option value="Electric">Electric</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label>Transmission</label>
+<select name="transmission" class="form-control">
+<option value="Automatic">Automatic</option>
+<option value="Manual">Manual</option>
+</select>
+</div>
+
+<div class="col-md-12">
+<label>Condition</label>
+<select name="condition" class="form-control">
+<option value="Used">Used</option>
+<option value="Certified Used">Certified Used</option>
+<option value="Like New">Like New</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label>Seller Type</label>
+<select name="seller_type" class="form-control">
+<option value="Dealership">Dealership</option>
+<option value="Private Seller">Private Seller</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label>Seller / Dealer Name</label>
+<input name="seller_name" class="form-control" placeholder="Your dealership or seller name" value="CARWA Auto" required>
+</div>
+
+<div class="col-md-4">
+<label>Seller Phone</label>
+<input name="seller_phone" class="form-control" placeholder="+971..." value="+971582119936" required>
+</div>
+
+<div class="col-md-12">
+<label>Description</label>
+<textarea name="description" class="form-control" rows="5" placeholder="Describe the service history, accident status, options, and selling points." required></textarea>
+</div>
+
+<div class="col-md-6">
+<label>Main Image</label>
+<input type="file" name="image" class="form-control" required>
+</div>
+
+<div class="col-md-6">
+<label>Gallery Images</label>
+<input type="file" name="gallery" class="form-control" multiple>
+</div>
+
+<div class="col-12">
+<button class="btn btn-dark">Publish Listing</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<div class="col-lg-4">
+<aside class="form-shell sticky-side-panel">
+<div class="section-head">
+<p class="eyebrow">Example Info</p>
+<h2>Right-Side Guide</h2>
+</div>
+
+<div class="image-help mb-3">
+<strong>Example seller name:</strong> ABC Motors
+<br>
+<strong>Example seller type:</strong> Dealership
+<br>
+<strong>Example seller phone:</strong> +971 50 123 4567
+</div>
+
+<div class="image-help mb-3">
+<strong>Example title:</strong> 2019 Toyota Camry LE
+<br>
+<strong>Example description:</strong> GCC specs, full service history, no major accidents, two keys, clean interior.
+</div>
+
+<div class="image-help">
+Use your own dealership name and number in the form on the left.
+<br>
+If you are listing as a private person, switch <b>Seller Type</b> to <b>Private Seller</b>.
+</div>
+</aside>
+</div>
+</div>
+</section>
+
+{% endblock %}

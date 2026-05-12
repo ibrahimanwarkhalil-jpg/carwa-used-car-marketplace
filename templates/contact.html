@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="form-shell">
+<div class="section-head">
+<p class="eyebrow">Get In Touch</p>
+<h2>Contact CARWA</h2>
+</div>
+
+{% if request.args.get("submitted") %}
+<div class="image-help mb-4">
+Your message was submitted. CARWA can now store general contact leads in the database for admin follow-up.
+</div>
+{% endif %}
+
+<form class="row g-3" method="POST" action="/contact">
+<div class="col-md-6">
+<input class="form-control" name="name" placeholder="Your Name" required>
+</div>
+<div class="col-md-6">
+<input class="form-control" name="email" placeholder="Email Address" required>
+</div>
+<div class="col-md-12">
+<input class="form-control" name="phone" placeholder="Phone Number">
+</div>
+<div class="col-md-12">
+<textarea class="form-control" name="message" rows="5" placeholder="Tell us what you need"></textarea>
+</div>
+<div class="col-md-12">
+<button class="btn btn-dark">Send Message</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+
+{% endblock %}

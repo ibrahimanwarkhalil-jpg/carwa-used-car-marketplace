@@ -1,0 +1,369 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero-section">
+<div class="container hero-layout">
+
+<div class="hero-left">
+<p class="eyebrow">Are You Looking For A Car?</p>
+<h1>Discover Your Perfect Car With CARWA</h1>
+<p class="hero-sub">Search used cars by category, location, brand, model, and budget with a cleaner UAE marketplace flow inspired by leading local car portals.</p>
+
+<div class="search-box mt-4">
+<div class="search-intro">
+<span>I&apos;m Looking for</span>
+</div>
+
+<div class="search-tabs">
+<button class="tab-active" type="button">Used</button>
+</div>
+
+<form action="/cars" method="GET">
+<div class="search-grid" data-search-bar>
+<div class="search-field">
+<label>Category</label>
+<select name="category" class="form-control search-select">
+<option value="">All</option>
+{% for category in search_options.categories %}
+<option value="{{ category }}">{{ category }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="search-field">
+<label>Location</label>
+<select name="location" class="form-control search-select">
+<option value="">All</option>
+{% for location in search_options.locations %}
+<option value="{{ location }}">{{ location }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="search-field">
+<label>Brand</label>
+<select name="brand" class="form-control search-select">
+<option value="">All</option>
+{% for brand in search_options.brands %}
+<option value="{{ brand }}">{{ brand }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="search-field">
+<label>Model</label>
+<input class="form-control search-input" value="All" readonly>
+</div>
+
+<div class="search-field search-field-price">
+<div class="search-field-price-inner">
+<div class="price-range-card" data-price-floor="{{ search_options.price_floor }}" data-price-ceiling="{{ search_options.price_ceiling }}">
+<label class="mb-0">Price in AED</label>
+<div class="range-shell">
+<div class="range-progress" data-price-progress></div>
+<div class="range-start-thumb" aria-hidden="true"></div>
+<input type="range" min="{{ search_options.price_floor }}" max="{{ search_options.price_ceiling }}" step="1000" value="{{ search_options.price_ceiling }}" data-price-max aria-label="Maximum price in AED">
+</div>
+<div class="price-range-text">
+<span data-price-min-display>{{ "{:,}".format(search_options.price_floor) }}</span>
+<span>-</span>
+<span data-price-max-display>{{ "{:,}".format(search_options.price_ceiling) }}</span>
+</div>
+<input type="hidden" name="min_price" value="{{ search_options.price_floor }}" data-price-min-field>
+<input type="hidden" name="max_price" value="{{ search_options.price_ceiling }}" data-price-max-field>
+</div>
+
+<button class="search-submit" type="submit" aria-label="Search cars">
+<i class="fa-solid fa-magnifying-glass"></i>
+</button>
+</div>
+</div>
+</form>
+
+<div class="hero-tool-links">
+<a href="/recommendations" class="btn btn-dark">
+<i class="fa-solid fa-wand-magic-sparkles"></i>
+Get Recommendations
+</a>
+<a href="/evaluate" class="btn btn-outline-dark">
+<i class="fa-solid fa-calculator"></i>
+Evaluate Price
+</a>
+</div>
+</div>
+
+<div class="stats-strip">
+<div class="stat-card">
+<strong>{{ stats.total_cars }}+</strong>
+<span>Vehicles Available</span>
+</div>
+<div class="stat-card">
+<strong>{{ stats.featured_cars }}</strong>
+<span>Featured Listings</span>
+</div>
+<div class="stat-card">
+<strong>{{ stats.brand_count }}</strong>
+<span>Brands Available</span>
+</div>
+</div>
+</div>
+
+<div class="hero-right">
+<div class="ad-slider" data-ad-images='["/static/uploads/carwa_ad.png"]'>
+<img src="/static/uploads/carwa_ad.png" alt="Featured marketplace banner">
+</div>
+<div class="ad-slider" data-ad-images='["/static/uploads/ad_1.jpg", "/static/uploads/ad_2.jpg", "/static/uploads/ad_3.jpg"]'>
+<img src="/static/uploads/ad_1.jpg" alt="Featured car banner">
+</div>
+</div>
+
+</div>
+</section>
+
+<section class="container section-space">
+<div class="section-head">
+<p class="eyebrow">Explore Popular Categories</p>
+<h2>Browse By Body Type</h2>
+</div>
+
+<div class="category-grid">
+{% for category in category_counts %}
+<a href="/cars?category={{ category.category }}" class="category-card">
+<span>{{ category.category }}</span>
+<strong>{{ category.total }} Cars</strong>
+</a>
+{% endfor %}
+</div>
+</section>
+
+<section class="container section-space">
+<div class="section-head section-head-inline">
+<div>
+<p class="eyebrow">Featured Inventory</p>
+<h2>Our Top Featured Vehicles</h2>
+</div>
+<a href="/cars" class="btn btn-outline-dark">All Vehicles</a>
+</div>
+
+<div class="section-tabs" data-featured-tabs>
+<button type="button" class="section-tab section-tab-active" data-featured-filter="all">All Cars</button>
+{% for category in featured_categories %}
+<button type="button" class="section-tab" data-featured-filter="{{ category|lower }}">{{ category }}</button>
+{% endfor %}
+</div>
+
+<div class="row g-4 featured-cars-grid">
+{% for car in cars %}
+<div class="col-xl-3 col-md-6" data-featured-item>
+<div class="card car-card featured-car-card h-100" data-card-link="/car/{{ car.id }}" data-featured-category="{{ car.category|lower }}" tabindex="0" role="link" aria-label="Open {{ car.title }}">
+<div class="car-image-wrap featured-rotator" data-images='{{ car.featured_images | tojson }}'>
+<img src="/static/uploads/{{ car.image }}" class="card-img-top featured-rotator-image" alt="{{ car.title }}">
+{% if car.featured_images|length > 1 %}
+<button type="button" class="featured-rotator-button featured-rotator-prev" aria-label="Show previous picture">
+&lsaquo;
+</button>
+<button type="button" class="featured-rotator-button featured-rotator-next" aria-label="Show next picture">
+&rsaquo;
+</button>
+{% endif %}
+<span class="featured-overlay-link">More Details</span>
+</div>
+<div class="card-body">
+<p class="featured-brand">{{ car.brand }}</p>
+<div class="car-meta-top">
+<span class="car-chip">{{ car.category }}</span>
+</div>
+<h5>{{ car.title }}</h5>
+<p class="car-specs">{{ car.year }} | {{ "{:,}".format(car.mileage) }} km</p>
+<div class="car-card-footer">
+<strong>AED {{ "{:,}".format(car.price) }}</strong>
+</div>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+
+<p class="featured-empty-state" data-featured-empty hidden>No featured vehicles match this category right now.</p>
+
+<div class="section-cta">
+<a href="/cars" class="btn btn-dark">All Vehicles</a>
+</div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const priceCard = document.querySelector(".price-range-card");
+  if (priceCard) {
+    const maxInput = priceCard.querySelector("[data-price-max]");
+    const minField = priceCard.querySelector("[data-price-min-field]");
+    const maxField = priceCard.querySelector("[data-price-max-field]");
+    const minDisplay = priceCard.querySelector("[data-price-min-display]");
+    const maxDisplay = priceCard.querySelector("[data-price-max-display]");
+    const progress = priceCard.querySelector("[data-price-progress]");
+
+    function formatPrice(value) {
+      return Number(value).toLocaleString();
+    }
+
+    function syncPriceInputs() {
+      const minValue = Number(minField.value);
+      const maxValue = Number(maxInput.value);
+      const range = Number(maxInput.max) - Number(maxInput.min);
+      const percent = range > 0 ? ((maxValue - Number(maxInput.min)) / range) * 100 : 100;
+
+      maxField.value = String(maxValue);
+      minDisplay.textContent = formatPrice(minValue);
+      maxDisplay.textContent = formatPrice(maxValue);
+      progress.style.width = percent + "%";
+    }
+
+    maxInput.addEventListener("input", function () {
+      syncPriceInputs();
+    });
+
+    syncPriceInputs();
+  }
+
+  const rotators = document.querySelectorAll(".featured-rotator");
+
+  rotators.forEach(function (rotator) {
+    const imageEl = rotator.querySelector(".featured-rotator-image");
+    const prevButton = rotator.querySelector(".featured-rotator-prev");
+    const nextButton = rotator.querySelector(".featured-rotator-next");
+    const images = JSON.parse(rotator.dataset.images || "[]");
+    let currentIndex = 0;
+
+    if (!imageEl || images.length <= 1) {
+      return;
+    }
+
+    function showImage(index) {
+      currentIndex = (index + images.length) % images.length;
+      imageEl.src = "/static/uploads/" + images[currentIndex];
+    }
+
+    if (prevButton) {
+      prevButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        showImage(currentIndex - 1);
+      });
+    }
+
+    if (nextButton) {
+      nextButton.addEventListener("click", function (event) {
+        event.preventDefault();
+        showImage(currentIndex + 1);
+      });
+    }
+  });
+
+  const featuredTabs = document.querySelectorAll("[data-featured-filter]");
+  const featuredCards = document.querySelectorAll("[data-featured-category]");
+  const featuredEmptyState = document.querySelector("[data-featured-empty]");
+
+  featuredTabs.forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      const filter = tab.dataset.featuredFilter;
+      let visibleCount = 0;
+
+      featuredTabs.forEach(function (item) {
+        item.classList.remove("section-tab-active");
+      });
+      tab.classList.add("section-tab-active");
+
+      featuredCards.forEach(function (card) {
+        const wrapper = card.closest("[data-featured-item]");
+        const matches = filter === "all" || card.dataset.featuredCategory === filter;
+        wrapper.style.display = matches ? "" : "none";
+        if (matches) {
+          visibleCount += 1;
+        }
+      });
+
+      if (featuredEmptyState) {
+        featuredEmptyState.hidden = visibleCount > 0;
+      }
+    });
+  });
+});
+</script>
+
+<section class="highlight-band">
+<div class="container highlight-grid">
+<div class="highlight-copy">
+<p class="eyebrow">Why Should You Choose Our Car Listing Services?</p>
+<h2>Built For Buyers Who Want A Faster, Cleaner UAE Marketplace Flow</h2>
+<p>If you are in the market for a used car, you want the search, featured inventory, pricing, and contact flow to feel simple. This homepage is now structured to surface categories first, featured stock second, and full inventory right when buyers need it.</p>
+</div>
+
+<div class="highlight-cards">
+<div class="mini-feature">
+<strong>{{ stats.total_cars }}+</strong>
+<span>Vehicles Available</span>
+</div>
+<div class="mini-feature">
+<strong>{{ stats.brand_count }}+</strong>
+<span>Brands Available</span>
+</div>
+<div class="mini-feature">
+<strong>{{ stats.featured_cars }}</strong>
+<span>Top Featured Vehicles</span>
+</div>
+</div>
+</div>
+</section>
+
+<section class="container section-space">
+<div class="section-head">
+<p class="eyebrow">What Our Customers Say About Us</p>
+<h2>Real Buyer Feedback</h2>
+</div>
+
+<div class="testimonial-grid">
+{% for testimonial in testimonials %}
+<article class="testimonial-card">
+<div class="testimonial-stars">5 star</div>
+<p>{{ testimonial.quote }}</p>
+<strong>{{ testimonial.name }}</strong>
+</article>
+{% endfor %}
+</div>
+</section>
+
+<section class="sell-banner">
+<div class="container sell-banner-inner">
+<div>
+<p class="eyebrow">Why You Should Sell Your Car To CARWA</p>
+<h2>List Faster And Reach Active Buyers</h2>
+<p>Add your car, upload photos, and place it inside the same marketplace flow buyers are already using to browse featured and full inventory.</p>
+</div>
+<div class="sell-banner-actions">
+<a href="/add" class="btn btn-light">Sell My Car</a>
+<a href="/evaluate" class="btn btn-outline-light">Evaluate My Car</a>
+</div>
+</div>
+</section>
+
+<section class="container section-space">
+<div class="section-head section-head-inline">
+<div>
+<p class="eyebrow">Blogs</p>
+<h2>Read Our Latest Blogs</h2>
+</div>
+<a href="/blog" class="btn btn-outline-dark">Read All</a>
+</div>
+
+<div class="blog-grid">
+{% for blog in latest_blogs %}
+<article class="blog-card">
+<h4>{{ blog.title }}</h4>
+<p>{{ blog.content }}</p>
+<a href="/blog" class="blog-readmore">Read More</a>
+</article>
+{% endfor %}
+</div>
+</section>
+
+{% endblock %}

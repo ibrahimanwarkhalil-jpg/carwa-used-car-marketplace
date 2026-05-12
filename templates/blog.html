@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="section-head">
+<p class="eyebrow">Editorial</p>
+<h2>CARWA Blog</h2>
+</div>
+
+<div class="blog-grid">
+{% for blog in blogs %}
+<article class="blog-card">
+<h4>{{ blog.title }}</h4>
+<p>{{ blog.content }}</p>
+</article>
+{% endfor %}
+</div>
+</div>
+</section>
+
+{% endblock %}

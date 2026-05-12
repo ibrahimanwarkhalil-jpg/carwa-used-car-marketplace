@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="section-head">
+<p class="eyebrow">Compare Tool</p>
+<h2>Compare Two Cars</h2>
+</div>
+
+<div class="form-shell mb-4">
+<form method="GET" action="/compare" class="row g-3 align-items-end">
+<div class="col-md-5">
+<label>Car 1</label>
+<select name="car1" class="form-control">
+<option value="">Select a car</option>
+{% for option in car_options %}
+<option value="{{ option.id }}" {% if selected_ids.car1 == (option.id ~ '') %}selected{% endif %}>{{ option.title }} | {{ option.year }} | AED {{ "{:,}".format(option.price) }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="col-md-5">
+<label>Car 2</label>
+<select name="car2" class="form-control">
+<option value="">Select a car</option>
+{% for option in car_options %}
+<option value="{{ option.id }}" {% if selected_ids.car2 == (option.id ~ '') %}selected{% endif %}>{{ option.title }} | {{ option.year }} | AED {{ "{:,}".format(option.price) }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="col-md-2">
+<button class="btn btn-dark w-100">Compare</button>
+</div>
+</form>
+</div>
+
+{% if cars|length == 2 %}
+<div class="table-responsive compare-table">
+<table class="table align-middle mb-0">
+<thead>
+<tr>
+<th>Specification</th>
+{% for car in cars %}
+<th>{{ car.title }}</th>
+{% endfor %}
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Image</td>
+{% for car in cars %}
+<td><img src="/static/uploads/{{ car.image }}" class="compare-thumb" alt="{{ car.title }}"></td>
+{% endfor %}
+</tr>
+<tr>
+<td>Price</td>
+{% for car in cars %}
+<td>AED {{ "{:,}".format(car.price) }}</td>
+{% endfor %}
+</tr>
+<tr>
+<td>Year</td>
+{% for car in cars %}
+<td>{{ car.year }}</td>
+{% endfor %}
+</tr>
+<tr>
+<td>Mileage</td>
+{% for car in cars %}
+<td>{{ "{:,}".format(car.mileage) }} km</td>
+{% endfor %}
+</tr>
+<tr>
+<td>Category</td>
+{% for car in cars %}
+<td>{{ car.category }}</td>
+{% endfor %}
+</tr>
+<tr>
+<td>Fuel Type</td>
+{% for car in cars %}
+<td>{{ car.fuel_type }}</td>
+{% endfor %}
+</tr>
+<tr>
+<td>Transmission</td>
+{% for car in cars %}
+<td>{{ car.transmission }}</td>
+{% endfor %}
+</tr>
+<tr>
+<td>Location</td>
+{% for car in cars %}
+<td>{{ car.location }}</td>
+{% endfor %}
+</tr>
+<tr>
+<td>Condition</td>
+{% for car in cars %}
+<td>{{ car.condition }}</td>
+{% endfor %}
+</tr>
+</tbody>
+</table>
+</div>
+{% else %}
+<div class="empty-state">
+<h4>Select two cars to compare</h4>
+<p>This brings CARWA closer to the side-by-side comparison flow users expect from a larger marketplace.</p>
+</div>
+{% endif %}
+</div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="row g-5 align-items-start">
+
+<div class="col-lg-7">
+<div
+class="detail-image-viewer"
+data-gallery-images='{{ ([car.image] + (images | map(attribute="image") | list)) | tojson }}'
+>
+<img id="mainCarImage" src="/static/uploads/{{ car.image }}" class="detail-image" alt="{{ car.title }}">
+<button type="button" class="detail-nav-button detail-nav-prev" aria-label="Show previous image">
+&lsaquo;
+</button>
+<button type="button" class="detail-nav-button detail-nav-next" aria-label="Show next image">
+&rsaquo;
+</button>
+</div>
+
+<div class="image-help" id="mainImagePath">
+<strong>Main image:</strong> <code>/static/uploads/{{ car.image }}</code>
+</div>
+
+{% if images %}
+<div class="row g-3 mt-2">
+{% for image in images %}
+<div class="col-4">
+<button
+type="button"
+class="gallery-thumb-button"
+data-image-src="/static/uploads/{{ image.image }}"
+data-image-path="/static/uploads/{{ image.image }}"
+>
+<img src="/static/uploads/{{ image.image }}" class="detail-gallery-image" alt="{{ car.title }} gallery image">
+</button>
+</div>
+{% endfor %}
+</div>
+<div class="image-help mt-2">
+<strong>More pictures:</strong> click any thumbnail to show it in the main image area.
+</div>
+{% else %}
+<div class="image-help mt-2">
+<strong>More pictures:</strong> none added yet. Use Edit Pictures to upload gallery images for this car.
+</div>
+{% endif %}
+</div>
+
+<div class="col-lg-5">
+<div class="detail-panel">
+{% if request.args.get("contact") %}
+<div class="image-help mb-3">
+Your seller inquiry has been submitted.
+</div>
+{% endif %}
+
+{% if request.args.get("booking") %}
+<div class="image-help mb-3">
+Your test-drive request has been submitted.
+</div>
+{% endif %}
+
+<div class="car-meta-top">
+<span class="car-chip">{{ car.category }}</span>
+<span class="car-chip">{{ car.location }}</span>
+<span class="car-chip">{{ car.condition }}</span>
+<span class="car-chip">{{ car.status }}</span>
+</div>
+
+<h1>{{ car.title }}</h1>
+<p class="car-specs">{{ car.brand }} {{ car.model }}</p>
+<h2>AED {{ "{:,}".format(car.price) }}</h2>
+
+<div class="image-help mb-3">
+<strong>Listed by:</strong> {{ car.seller_name }} ({{ car.seller_type }})
+<br>
+<strong>Seller phone:</strong> {{ car.seller_phone }}
+</div>
+
+<div class="spec-grid">
+<div><span>Year</span><strong>{{ car.year }}</strong></div>
+<div><span>Mileage</span><strong>{{ "{:,}".format(car.mileage) }} km</strong></div>
+<div><span>Fuel</span><strong>{{ car.fuel_type }}</strong></div>
+<div><span>Transmission</span><strong>{{ car.transmission }}</strong></div>
+</div>
+
+<p class="detail-description">{{ car.description }}</p>
+
+<div class="detail-actions">
+<a href="/wishlist/{{ car.id }}" class="btn btn-dark">Save To Wishlist</a>
+<a href="https://wa.me/971582119936?text=I%20am%20interested%20in%20{{ car.title | replace(' ', '%20') }}" class="btn btn-outline-dark">Contact On WhatsApp</a>
+<a href="/finance?car_id={{ car.id }}" class="btn btn-outline-dark">Finance</a>
+{% if session.get("admin_username") %}
+<a href="/car/{{ car.id }}/edit" class="btn btn-outline-secondary">Edit Listing</a>
+{% endif %}
+</div>
+
+<div class="image-help mt-3">
+{% if session.get("admin_username") %}
+Use <a href="/car/{{ car.id }}/edit">Edit Listing</a> to replace the current main picture or add more gallery photos.
+{% else %}
+Ask the admin to use the Edit Listing page to replace the current main picture or add more gallery photos.
+{% endif %}
+</div>
+
+<div class="row g-3 mt-4">
+<div class="col-md-6">
+<div class="form-shell h-100">
+<h4>Contact Seller</h4>
+<form method="POST" action="/lead/contact/{{ car.id }}" class="row g-3">
+<div class="col-12">
+<input class="form-control" name="name" placeholder="Your Name" required>
+</div>
+<div class="col-12">
+<input class="form-control" name="email" placeholder="Email Address" required>
+</div>
+<div class="col-12">
+<input class="form-control" name="phone" placeholder="Phone Number" required>
+</div>
+<div class="col-12">
+<textarea class="form-control" name="message" rows="4" placeholder="Tell us what you want to know"></textarea>
+</div>
+<div class="col-12">
+<button class="btn btn-dark">Send Inquiry</button>
+</div>
+</form>
+</div>
+</div>
+
+<div class="col-md-6">
+<div class="form-shell h-100">
+<h4>Book Test Drive</h4>
+<form method="POST" action="/lead/book/{{ car.id }}" class="row g-3">
+<div class="col-12">
+<input class="form-control" name="name" placeholder="Your Name" required>
+</div>
+<div class="col-12">
+<input class="form-control" name="email" placeholder="Email Address" required>
+</div>
+<div class="col-12">
+<input class="form-control" name="phone" placeholder="Phone Number" required>
+</div>
+<div class="col-6">
+<input class="form-control" type="date" name="preferred_date" required>
+</div>
+<div class="col-6">
+<input class="form-control" type="time" name="preferred_time" required>
+</div>
+<div class="col-12">
+<button class="btn btn-outline-dark">Request Test Drive</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+{% if related_cars %}
+<div class="section-head mt-5">
+<p class="eyebrow">Related Cars</p>
+<h2>More In {{ car.category }}</h2>
+</div>
+
+<div class="row g-4">
+{% for related_car in related_cars %}
+<div class="col-md-4">
+<div class="card car-card h-100" data-card-link="/car/{{ related_car.id }}" tabindex="0" role="link" aria-label="Open {{ related_car.title }}">
+<div class="car-image-wrap">
+<img src="/static/uploads/{{ related_car.image }}" class="card-img-top" alt="{{ related_car.title }}">
+</div>
+<div class="card-body">
+<h5>{{ related_car.title }}</h5>
+<p class="car-specs">{{ related_car.year }} | {{ "{:,}".format(related_car.mileage) }} km</p>
+<div class="car-card-footer">
+<strong>AED {{ "{:,}".format(related_car.price) }}</strong>
+<a href="/car/{{ related_car.id }}" class="btn btn-outline-dark">Open</a>
+</div>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+{% endif %}
+
+</div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const viewer = document.querySelector(".detail-image-viewer");
+  const mainImage = document.getElementById("mainCarImage");
+  const mainImagePath = document.getElementById("mainImagePath");
+  const thumbs = document.querySelectorAll(".gallery-thumb-button");
+  const prevButton = document.querySelector(".detail-nav-prev");
+  const nextButton = document.querySelector(".detail-nav-next");
+  const galleryImages = viewer ? JSON.parse(viewer.dataset.galleryImages || "[]") : [];
+  let currentIndex = 0;
+
+  function showImageByIndex(index) {
+    if (!galleryImages.length) {
+      return;
+    }
+
+    currentIndex = (index + galleryImages.length) % galleryImages.length;
+    const path = "/static/uploads/" + galleryImages[currentIndex];
+    mainImage.src = path;
+    mainImagePath.innerHTML = "<strong>Main image:</strong> <code>" + path + "</code>";
+  }
+
+  thumbs.forEach(function (thumb) {
+    thumb.addEventListener("click", function () {
+      const src = thumb.getAttribute("data-image-src");
+      const path = thumb.getAttribute("data-image-path");
+      currentIndex = galleryImages.indexOf(path.replace("/static/uploads/", ""));
+      mainImage.src = src;
+      mainImagePath.innerHTML = "<strong>Main image:</strong> <code>" + path + "</code>";
+    });
+  });
+
+  if (prevButton) {
+    prevButton.addEventListener("click", function () {
+      showImageByIndex(currentIndex - 1);
+    });
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener("click", function () {
+      showImageByIndex(currentIndex + 1);
+    });
+  }
+});
+</script>
+
+{% endblock %}

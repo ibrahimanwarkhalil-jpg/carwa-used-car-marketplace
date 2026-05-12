@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="form-shell">
+<div class="section-head">
+<p class="eyebrow">Listing Manager</p>
+<h2>Edit {{ car.title }}</h2>
+</div>
+
+<div class="image-help mb-4">
+<strong>Current main picture:</strong> <code>static/uploads/{{ car.image }}</code>
+<br>
+Upload a new file in "Replace Main Image" if you want to change the current picture.
+<br>
+Use "Add More Gallery Images" to append more photos for this same car.
+</div>
+
+<form method="POST" enctype="multipart/form-data" class="row g-3">
+<div class="col-md-6">
+<label>Listing Title</label>
+<input name="title" class="form-control" value="{{ car.title }}" required>
+</div>
+
+<div class="col-md-3">
+<label>Brand</label>
+<input name="brand" class="form-control" value="{{ car.brand }}" required>
+</div>
+
+<div class="col-md-3">
+<label>Model</label>
+<input name="model" class="form-control" value="{{ car.model }}" required>
+</div>
+
+<div class="col-md-3">
+<label>Year</label>
+<input name="year" type="number" class="form-control" value="{{ car.year }}" required>
+</div>
+
+<div class="col-md-3">
+<label>Mileage</label>
+<input name="mileage" type="number" class="form-control" value="{{ car.mileage }}" required>
+</div>
+
+<div class="col-md-3">
+<label>Price</label>
+<input name="price" type="number" class="form-control" value="{{ car.price }}" required>
+</div>
+
+<div class="col-md-3">
+<label>Location</label>
+<select name="location" class="form-control">
+{% for location in search_options.locations %}
+<option value="{{ location }}" {% if car.location == location %}selected{% endif %}>{{ location }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="col-md-4">
+<label>Category</label>
+<select name="category" class="form-control">
+{% for category in search_options.categories %}
+<option value="{{ category }}" {% if car.category == category %}selected{% endif %}>{{ category }}</option>
+{% endfor %}
+<option value="SUV" {% if car.category == "SUV" %}selected{% endif %}>SUV</option>
+<option value="Coupe" {% if car.category == "Coupe" %}selected{% endif %}>Coupe</option>
+<option value="Hatchback" {% if car.category == "Hatchback" %}selected{% endif %}>Hatchback</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label>Fuel Type</label>
+<select name="fuel_type" class="form-control">
+<option value="Petrol" {% if car.fuel_type == "Petrol" %}selected{% endif %}>Petrol</option>
+<option value="Diesel" {% if car.fuel_type == "Diesel" %}selected{% endif %}>Diesel</option>
+<option value="Hybrid" {% if car.fuel_type == "Hybrid" %}selected{% endif %}>Hybrid</option>
+<option value="Electric" {% if car.fuel_type == "Electric" %}selected{% endif %}>Electric</option>
+</select>
+</div>
+
+<div class="col-md-4">
+<label>Transmission</label>
+<select name="transmission" class="form-control">
+<option value="Automatic" {% if car.transmission == "Automatic" %}selected{% endif %}>Automatic</option>
+<option value="Manual" {% if car.transmission == "Manual" %}selected{% endif %}>Manual</option>
+</select>
+</div>
+
+<div class="col-md-6">
+<label>Condition</label>
+<select name="condition" class="form-control">
+<option value="Used" {% if car.condition == "Used" %}selected{% endif %}>Used</option>
+<option value="Certified Used" {% if car.condition == "Certified Used" %}selected{% endif %}>Certified Used</option>
+<option value="Like New" {% if car.condition == "Like New" %}selected{% endif %}>Like New</option>
+</select>
+</div>
+
+<div class="col-md-6">
+<label>Seller Type</label>
+<select name="seller_type" class="form-control">
+<option value="Dealership" {% if car.seller_type == "Dealership" %}selected{% endif %}>Dealership</option>
+<option value="Private Seller" {% if car.seller_type == "Private Seller" %}selected{% endif %}>Private Seller</option>
+</select>
+</div>
+
+<div class="col-md-6">
+<label>Seller / Dealer Name</label>
+<input name="seller_name" class="form-control" value="{{ car.seller_name }}" required>
+</div>
+
+<div class="col-md-6">
+<label>Seller Phone</label>
+<input name="seller_phone" class="form-control" value="{{ car.seller_phone }}" required>
+</div>
+
+<div class="col-md-6">
+<label>Status</label>
+<select name="status" class="form-control">
+<option value="Available" {% if car.status == "Available" %}selected{% endif %}>Available</option>
+<option value="Pending Review" {% if car.status == "Pending Review" %}selected{% endif %}>Pending Review</option>
+<option value="Sold" {% if car.status == "Sold" %}selected{% endif %}>Sold</option>
+<option value="Archived" {% if car.status == "Archived" %}selected{% endif %}>Archived</option>
+</select>
+</div>
+
+<div class="col-md-6">
+<label class="d-block">Featured Listing</label>
+<div class="form-check mt-2">
+<input class="form-check-input" type="checkbox" name="featured" id="featured" {% if car.featured %}checked{% endif %}>
+<label class="form-check-label" for="featured">Show this car as featured</label>
+</div>
+</div>
+
+<div class="col-md-12">
+<label>Description</label>
+<textarea name="description" class="form-control" rows="5" required>{{ car.description }}</textarea>
+</div>
+
+<div class="col-md-6">
+<label>Replace Main Image</label>
+<input type="file" name="image" class="form-control">
+</div>
+
+<div class="col-md-6">
+<label>Add More Gallery Images</label>
+<input type="file" name="gallery" class="form-control" multiple>
+</div>
+
+{% if images %}
+<div class="col-12">
+<div class="row g-3">
+{% for image in images %}
+<div class="col-md-3 col-6">
+<img src="/static/uploads/{{ image.image }}" class="detail-gallery-image" alt="{{ car.title }} gallery image">
+</div>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+
+<div class="col-12">
+<button class="btn btn-dark">Save Changes</button>
+<a href="/car/{{ car.id }}" class="btn btn-outline-secondary">Back To Listing</a>
+</div>
+</form>
+</div>
+</div>
+</section>
+
+{% endblock %}

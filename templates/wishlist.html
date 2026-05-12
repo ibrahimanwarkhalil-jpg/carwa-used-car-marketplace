@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="section-head">
+<p class="eyebrow">Saved Inventory</p>
+<h2>My Wishlist</h2>
+</div>
+
+{% if cars %}
+<div class="row g-4">
+{% for car in cars %}
+<div class="col-lg-4 col-md-6">
+<div class="card car-card h-100" data-card-link="/car/{{ car.id }}" tabindex="0" role="link" aria-label="Open {{ car.title }}">
+<div class="car-image-wrap">
+<img src="/static/uploads/{{ car.image }}" class="card-img-top" alt="{{ car.title }}">
+</div>
+<div class="card-body">
+<div class="car-meta-top">
+<span class="car-chip">{{ car.category }}</span>
+<span class="car-chip">{{ car.location }}</span>
+</div>
+<h5>{{ car.title }}</h5>
+<p class="car-specs">{{ car.year }} | {{ "{:,}".format(car.mileage) }} km</p>
+<div class="car-card-footer">
+<strong>AED {{ "{:,}".format(car.price) }}</strong>
+<a href="/car/{{ car.id }}" class="btn btn-outline-dark">View</a>
+</div>
+</div>
+</div>
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+<h4>Your wishlist is empty</h4>
+<p>Save cars while browsing and they will appear here for quick comparison.</p>
+<a href="/cars" class="btn btn-dark">Browse Cars</a>
+</div>
+{% endif %}
+</div>
+</section>
+
+{% endblock %}

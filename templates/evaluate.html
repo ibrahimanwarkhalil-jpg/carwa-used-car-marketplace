@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+
+<div class="section-head section-head-inline">
+<div>
+<p class="eyebrow">Price Evaluation</p>
+<h2>Used Car Market Value</h2>
+</div>
+<a href="/recommendations" class="btn btn-outline-dark">Recommended Cars</a>
+</div>
+
+<div class="row g-4">
+<div class="col-lg-5">
+<div class="form-shell h-100">
+<form action="/evaluate" method="POST" class="row g-3">
+<div class="col-md-6">
+<label>Brand</label>
+<select name="brand" class="form-control">
+<option value="">Any Brand</option>
+{% for brand in search_options.brands %}
+<option value="{{ brand }}" {% if current_values.get("brand") == brand %}selected{% endif %}>{{ brand }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="col-md-6">
+<label>Model</label>
+<input name="model" class="form-control" value="{{ current_values.get('model', '') }}" placeholder="Altima, Sunny, ES 350">
+</div>
+<div class="col-md-6">
+<label>Year</label>
+<input name="year" type="number" min="1980" max="{{ current_year + 1 }}" class="form-control" value="{{ current_values.get('year', '') }}" placeholder="{{ current_year - 5 }}" required>
+</div>
+<div class="col-md-6">
+<label>Mileage</label>
+<input name="mileage" type="number" min="0" class="form-control" value="{{ current_values.get('mileage', '') }}" placeholder="120000" required>
+</div>
+<div class="col-md-6">
+<label>Body Type</label>
+<select name="category" class="form-control">
+<option value="">Any Category</option>
+{% for category in search_options.categories %}
+<option value="{{ category }}" {% if current_values.get("category") == category %}selected{% endif %}>{{ category }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="col-md-6">
+<label>Location</label>
+<select name="location" class="form-control">
+<option value="">Any Location</option>
+{% for location in search_options.locations %}
+<option value="{{ location }}" {% if current_values.get("location") == location %}selected{% endif %}>{{ location }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="col-md-4">
+<label>Fuel</label>
+<select name="fuel_type" class="form-control">
+{% for fuel_type in search_options.fuel_types %}
+<option value="{{ fuel_type }}" {% if current_values.get("fuel_type", "Petrol") == fuel_type %}selected{% endif %}>{{ fuel_type }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="col-md-4">
+<label>Transmission</label>
+<select name="transmission" class="form-control">
+{% for transmission in search_options.transmissions %}
+<option value="{{ transmission }}" {% if current_values.get("transmission", "Automatic") == transmission %}selected{% endif %}>{{ transmission }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="col-md-4">
+<label>Condition</label>
+<select name="condition" class="form-control">
+{% for condition in ["Used", "Excellent", "Fair", "New"] %}
+<option value="{{ condition }}" {% if current_values.get("condition", "Used") == condition %}selected{% endif %}>{{ condition }}</option>
+{% endfor %}
+</select>
+</div>
+<div class="col-12">
+<button class="btn btn-dark w-100">Calculate Price</button>
+</div>
+</form>
+</div>
+</div>
+
+<div class="col-lg-7">
+{% if result %}
+{% if result.errors %}
+<div class="empty-state">
+<h4>Valuation could not be calculated</h4>
+{% for error in result.errors %}
+<p>{{ error }}</p>
+{% endfor %}
+</div>
+{% else %}
+<div class="detail-panel valuation-result">
+<p class="eyebrow">Estimated Market Value</p>
+<h2>AED {{ "{:,}".format(result.estimate) }}</h2>
+<p class="valuation-range">Expected range: AED {{ "{:,}".format(result.range_low) }} - AED {{ "{:,}".format(result.range_high) }}</p>
+
+<div class="valuation-metrics">
+<div>
+<span>Confidence</span>
+<strong>{{ result.confidence_label }}</strong>
+</div>
+<div>
+<span>Score</span>
+<strong>{{ result.confidence }}%</strong>
+</div>
+<div>
+<span>Comparables</span>
+<strong>{{ result.comparable_count }}</strong>
+</div>
+</div>
+
+<ul class="valuation-notes">
+{% for note in result.notes %}
+<li>{{ note }}</li>
+{% endfor %}
+</ul>
+</div>
+
+<div class="form-shell mt-4">
+<div class="section-head section-head-inline compact-head">
+<div>
+<p class="eyebrow">Market Evidence</p>
+<h3>Closest Active Listings</h3>
+</div>
+</div>
+
+<div class="valuation-comparables">
+{% for car in result.comparables %}
+<a href="/car/{{ car.id }}" class="valuation-comparable-row">
+<span>
+<strong>{{ car.title }}</strong>
+<small>{{ car.year }} | {{ "{:,}".format(car.mileage) }} km | {{ car.location }}</small>
+</span>
+<span>
+<strong>AED {{ "{:,}".format(car.price) }}</strong>
+<small>{{ car.match_score }}% match</small>
+</span>
+</a>
+{% endfor %}
+</div>
+</div>
+{% endif %}
+{% else %}
+<div class="detail-panel valuation-placeholder">
+<p class="eyebrow">Model Output</p>
+<h2>Estimate, confidence, and comparable listings</h2>
+<div class="valuation-metrics">
+<div>
+<span>Input</span>
+<strong>Vehicle profile</strong>
+</div>
+<div>
+<span>Method</span>
+<strong>Comparable scoring</strong>
+</div>
+<div>
+<span>Output</span>
+<strong>Price range</strong>
+</div>
+</div>
+</div>
+{% endif %}
+</div>
+</div>
+
+</div>
+</section>
+
+{% endblock %}

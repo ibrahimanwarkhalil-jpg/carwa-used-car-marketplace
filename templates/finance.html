@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="page-shell">
+<div class="container">
+<div class="form-shell">
+<div class="section-head">
+<p class="eyebrow">Finance Desk</p>
+<h2>Apply For Car Finance</h2>
+</div>
+
+{% if request.args.get("submitted") %}
+<div class="image-help mb-4">
+Your finance request was submitted and is now visible in the admin dashboard.
+</div>
+{% endif %}
+
+<form method="POST" action="/finance" class="row g-3">
+<div class="col-md-6">
+<label>Name</label>
+<input class="form-control" name="name" required>
+</div>
+
+<div class="col-md-6">
+<label>Email</label>
+<input class="form-control" name="email" required>
+</div>
+
+<div class="col-md-6">
+<label>Phone</label>
+<input class="form-control" name="phone" required>
+</div>
+
+<div class="col-md-6">
+<label>Select Car</label>
+<select class="form-control" name="car_id">
+<option value="">General Finance Inquiry</option>
+{% for option in car_options %}
+<option value="{{ option.id }}" {% if request.args.get("car_id") == (option.id ~ '') %}selected{% endif %}>{{ option.title }} | AED {{ "{:,}".format(option.price) }}</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="col-md-4">
+<label>Budget</label>
+<input class="form-control" name="budget" placeholder="90000" required>
+</div>
+
+<div class="col-md-4">
+<label>Down Payment</label>
+<input class="form-control" name="down_payment" placeholder="20000" required>
+</div>
+
+<div class="col-md-4">
+<label>Tenure (Months)</label>
+<input class="form-control" name="tenure_months" placeholder="48" required>
+</div>
+
+<div class="col-12">
+<button class="btn btn-dark">Submit Finance Request</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+
+{% endblock %}

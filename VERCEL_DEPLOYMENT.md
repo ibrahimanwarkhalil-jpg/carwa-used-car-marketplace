@@ -31,4 +31,6 @@ This project uses SQLite and local image uploads. On Vercel, serverless files ar
 
 ## Size warning
 
-The `static` folder is large because it contains many car photos. If Vercel rejects the deployment because of size, compress the images or host them on Cloudinary/Vercel Blob and store image URLs in the database.
+The `static` folder is large because it contains many car photos. `.vercelignore` excludes unused duplicate HEIC originals to keep the deployment under Vercel's serverless bundle limit.
+
+If Vercel still rejects the deployment because of size, compress the remaining images or host them on Cloudinary/Vercel Blob and store image URLs in the database.

@@ -40,8 +40,17 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 @app.route("/favicon.ico")
 def favicon():
     return send_from_directory(
-        os.path.join(app.root_path, "static/uploads/logo"),
-        "logo.png",
+        app.root_path,
+        "favicon.ico",
+        mimetype="image/x-icon",
+    )
+
+
+@app.route("/favicon.png")
+def favicon_png():
+    return send_from_directory(
+        app.root_path,
+        "favicon.png",
         mimetype="image/png",
     )
 

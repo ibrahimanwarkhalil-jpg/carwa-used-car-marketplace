@@ -200,6 +200,30 @@ CATEGORY_IMAGE_PATHS = {
     "Minivan": "uploads/categories_pictures/minivan.png",
 }
 
+UAE_LOCATION_OPTIONS = [
+    "Abu Dhabi",
+    "Dubai",
+    "Sharjah",
+    "Ajman",
+    "Ras Al Khaimah",
+    "Fujairah",
+    "Umm Al Quwain",
+]
+
+FUEL_TYPE_OPTIONS = [
+    "Petrol",
+    "Diesel",
+    "Hybrid",
+    "Electric",
+]
+
+TRANSMISSION_OPTIONS = [
+    "Automatic",
+    "Manual",
+    "DCT",
+    "CVT",
+]
+
 SUNNY_2009_LISTING = {
     "title": "2009 Nissan Sunny 1.6 GCC Specs",
     "brand": "Nissan",
@@ -208,7 +232,7 @@ SUNNY_2009_LISTING = {
     "price": 7500,
     "mileage": 380000,
     "description": "Golden Nissan Sunny 1.6 with GCC specs, very well maintained, and ready for daily driving.",
-    "image": "sunny_2009/sunny2009_1.jpg",
+    "image": "sunny_2009/sunny2009_5.jpg",
     "gallery_images": [
         "sunny_2009/sunny2009_2.jpg",
         "sunny_2009/sunny2009_3.jpg",
@@ -304,8 +328,9 @@ GALANT_2008_LISTING = {
     "price": 8000,
     "mileage": 275000,
     "description": "Silver Mitsubishi Galant with GCC specs, full option, grey seats, and very well maintained condition.",
-    "image": "galant_2008/galant_7.JPG",
+    "image": "galant_2008/galant_10.jpg",
     "gallery_images": [
+        "galant_2008/galant_10.jpg",
         "galant_2008/galant_1.JPG",
         "galant_2008/galant_2.JPG",
         "galant_2008/galant_3.JPG",
@@ -314,7 +339,6 @@ GALANT_2008_LISTING = {
         "galant_2008/galant_6.jpg",
         "galant_2008/galant_8.JPG",
         "galant_2008/galant_9.jpg",
-        "galant_2008/galant_10.jpg",
     ],
     "category": "Sedan",
     "location": "Dubai",
@@ -336,7 +360,7 @@ IS250_2011_LISTING = {
     "price": 21000,
     "mileage": 262000,
     "description": "Dark grey Lexus IS 250 with American specs, black interior, black leather seats, full option, and excellent condition.",
-    "image": "is250_2011/is250_2011_2.JPG",
+    "image": "is250_2011/is250_2011_5.JPG",
     "gallery_images": [
         "is250_2011/is250_2011_2.JPG",
         "is250_2011/is250_2011_3.JPG",
@@ -372,7 +396,7 @@ SUNNY_2015_LISTING = {
     "price": 14000,
     "mileage": 162000,
     "description": "White Nissan Sunny with manual gear, GCC specs, and clean practical condition for everyday driving.",
-    "image": "sunny_2015/sunny2015_5.jpg",
+    "image": "sunny_2015/sunny2015_2.jpg",
     "gallery_images": [
         "sunny_2015/sunny2015_2.jpg",
         "sunny_2015/sunny2015_3.jpg",
@@ -439,14 +463,14 @@ TIIDA_2007_LISTING = {
     "price": 7500,
     "mileage": 340000,
     "description": "White Nissan Tiida with GCC specs, beige interior, excellent condition, and a very well maintained history.",
-    "image": "tiida_2007/tiida_1.JPG",
+    "image": "tiida_2007/tiida_7.JPG",
     "gallery_images": [
+        "tiida_2007/tiida_7.JPG",
         "tiida_2007/tiida_2.JPG",
         "tiida_2007/tiida_3.JPG",
         "tiida_2007/tiida_4.JPG",
         "tiida_2007/tiida_5.JPG",
         "tiida_2007/tiida_6.JPG",
-        "tiida_2007/tiida_7.JPG",
         "tiida_2007/tiida_8.JPG",
         "tiida_2007/tiida_9.JPG",
         "tiida_2007/tiida_10.JPG",
@@ -471,7 +495,7 @@ TIIDA_2016_LISTING = {
     "price": 20000,
     "mileage": 158000,
     "description": "Pearl white Nissan Tiida with GCC specs, beige interior, mid option trim, and a clean, well-kept condition.",
-    "image": "tiida_2016/tiida2016_9.jpg",
+    "image": "tiida_2016/tiida2016_6.jpg",
     "gallery_images": [
         "tiida_2016/tiida2016_2.jpg",
         "tiida_2016/tiida2016_3.JPG",
@@ -502,14 +526,14 @@ ALTIMA_2007_LISTING = {
     "price": 7500,
     "mileage": 202000,
     "description": "Grey Nissan Altima 2.5 with GCC specs, excellent condition, and a very well maintained history.",
-    "image": "altima_2007/altima2007_6.jpg",
+    "image": "altima_2007/altima2007_7.jpg",
     "gallery_images": [
+        "altima_2007/altima2007_7.jpg",
         "altima_2007/altima2007_2.jpg",
         "altima_2007/altima2007_3.jpg",
         "altima_2007/altima2007_4.jpg",
         "altima_2007/altima2007_5.jpg",
         "altima_2007/altima2007_6.jpg",
-        "altima_2007/altima2007_7.jpg",
         "altima_2007/altima2007_8.jpg",
         "altima_2007/altima2007_9.jpg",
         "altima_2007/altima2007_10.jpg",
@@ -599,7 +623,7 @@ PATROL_2015_LISTING = {
     "price": 55000,
     "mileage": 142000,
     "description": "Pearl white Nissan Patrol Platinum VIP Edition with GCC specs, beige interior, 5.6L V8, and excellent condition with strong maintenance history.",
-    "image": "patrol_2015/patrol2015_5.JPG",
+    "image": "patrol_2015/main.jpeg",
     "gallery_images": [
         "patrol_2015/patrol2015_2.jpg",
         "patrol_2015/patrol2015_3.jpg",
@@ -633,7 +657,7 @@ RX350_2013_LISTING = {
     "price": 45000,
     "mileage": 202000,
     "description": "Black Lexus RX 350 with GCC specs, black interior, brown seats, panoramic sunroof, full option trim, and excellent well maintained condition.",
-    "image": "rx350_2013/rx350_2.jpg",
+    "image": "rx350_2013/rx350_12.jpeg",
     "gallery_images": [
         "rx350_2013/rx350_2.jpg",
         "rx350_2013/rx350_3.jpg",
@@ -699,8 +723,9 @@ BLUE_IS250_2011_LISTING = {
     "price": 22000,
     "mileage": 252000,
     "description": "Dark blue Lexus IS 250 with American specs, rear wheel drive, full option trim, excellent condition, modified exhaust, rear spoiler, F Sport headlights and taillights, and 19-inch F Sport rims.",
-    "image": "blue_is250_2011/blue_is250_2.JPG",
+    "image": "blue_is250_2011/blue_is250_main.jpeg",
     "gallery_images": [
+        "blue_is250_2011/blue_is250_main.jpeg",
         "blue_is250_2011/blue_is250_2.JPG",
         "blue_is250_2011/blue_is250_3.jpg",
         "blue_is250_2011/blue_is250_4.jpg",
@@ -801,8 +826,9 @@ FORD_EXPLORER_2014_LISTING = {
     "price": 30000,
     "mileage": 212000,
     "description": "Silver Ford Explorer with GCC specs, black interior, mid option trim, excellent condition, and ready to buy and drive with no work required.",
-    "image": "ford_explorer_2014/ford_explorer_3.jpg",
+    "image": "ford_explorer_2014/ford_explorer_main.jpeg",
     "gallery_images": [
+        "ford_explorer_2014/ford_explorer_main.jpeg",
         "ford_explorer_2014/ford_explorer_2.JPG",
         "ford_explorer_2014/ford_explorer_3.jpg",
         "ford_explorer_2014/ford_explorer_4.jpg",
@@ -837,8 +863,9 @@ SENTRA_2016_LISTING = {
     "price": 20000,
     "mileage": 162000,
     "description": "Grey Nissan Sentra with GCC specs, beige interior, mid option trim, excellent condition, and well maintained buy-and-drive readiness.",
-    "image": "nissan_sentra/sentra2016_4.jpg",
+    "image": "nissan_sentra/sentra2016_main.jpeg",
     "gallery_images": [
+        "nissan_sentra/sentra2016_main.jpeg",
         "nissan_sentra/sentra2016_2.jpg",
         "nissan_sentra/sentra2016_3.jpg",
         "nissan_sentra/sentra2016_4.jpg",
@@ -903,7 +930,7 @@ SUNNY_2018_LISTING = {
     "price": 18000,
     "mileage": 152000,
     "description": "White Nissan Sunny 1.5 with manual gear, GCC specs, beige interior, very clean condition, excellent overall shape, and service history available.",
-    "image": "sunny_2018/sunny2018_9.JPG",
+    "image": "sunny_2018/sunny2018_2.JPG",
     "gallery_images": [
         "sunny_2018/sunny2018_2.JPG",
         "sunny_2018/sunny2018_3.JPG",
@@ -935,8 +962,9 @@ MURANO_2008_LISTING = {
     "price": 14000,
     "mileage": 262000,
     "description": "Pearl white Nissan Murano with GCC specs, beige interior, mid option trim, excellent condition, no issues, lady driven, and very well maintained.",
-    "image": "murano_2008/murano_6.JPG",
+    "image": "murano_2008/murano_main.jpeg",
     "gallery_images": [
+        "murano_2008/murano_main.jpeg",
         "murano_2008/murano_2.JPG",
         "murano_2008/murano_3.JPG",
         "murano_2008/murano_4.JPG",
@@ -969,8 +997,9 @@ PAJERO_2014_LISTING = {
     "price": 25000,
     "mileage": 202000,
     "description": "Pearl white Mitsubishi Pajero with GCC specs, beige interior, full option trim, excellent condition, and service history available.",
-    "image": "pajero_2012/pajero2012_6.jpg",
+    "image": "pajero_2012/pajero_main.jpeg",
     "gallery_images": [
+        "pajero_2012/pajero_main.jpeg",
         "pajero_2012/pajero2012_2.jpg",
         "pajero_2012/pajero2012_3.jpg",
         "pajero_2012/pajero2012_4.jpg",
@@ -1002,7 +1031,7 @@ PAJERO_2020_LISTING = {
     "price": 50000,
     "mileage": 108000,
     "description": "Red Mitsubishi Pajero with GCC specs, beige interior, excellent condition, no maintenance required, and service records available.",
-    "image": "pajero_2016/pajero2020_1.jpg",
+    "image": "pajero_2016/pajero2020_2.jpg",
     "gallery_images": [
         "pajero_2016/pajero2020_2.jpg",
         "pajero_2016/pajero2020_3.jpg",
@@ -1039,23 +1068,6 @@ SAMPLE_CARS = [
         "image": "camry.jpg",
         "category": "Sedan",
         "location": "Dubai",
-        "fuel_type": "Petrol",
-        "transmission": "Automatic",
-        "condition": "Used",
-        "featured": 1,
-        "status": "Available",
-    },
-    {
-        "title": "Toyota Camry SE 2018",
-        "brand": "Toyota",
-        "model": "Camry SE",
-        "year": 2018,
-        "price": 39000,
-        "mileage": 118000,
-        "description": "Well-kept midsize sedan with smooth automatic driving, practical cabin space, and similar value-focused pricing.",
-        "image": "camry.jpg",
-        "category": "Sedan",
-        "location": "Sharjah",
         "fuel_type": "Petrol",
         "transmission": "Automatic",
         "condition": "Used",
@@ -1486,7 +1498,6 @@ SAMPLE_CARS = [
 ]
 
 DESCRIPTION_OVERRIDES = {
-    "Toyota Camry SE 2018": "Well-kept Toyota Camry SE with smooth automatic driving, practical midsize sedan comfort, and value-focused pricing around the same market band. Clean presentation, dependable everyday usability, and strong resale appeal make it a sensible daily driver.",
     "2009 Nissan Sunny 1.6 GCC Specs": "Golden Nissan Sunny 1.6 with GCC specs, 380k km, and a very well maintained ownership history. Practical daily sedan with straightforward running costs, clean presentation, and dependable city-use comfort.",
     "2017 Nissan Altima GCC Specs": "White Nissan Altima with GCC specs, beige interior, and 142k km on the odometer. Excellent condition sedan with a roomy cabin, smooth automatic drive, and a strong maintenance profile for daily use.",
     "2010 Lexus ES 350 American Specs": "Dark grey Lexus ES 350 with American specs, 260k km, and a striking orange leather interior. Comfortable V6 luxury sedan with a quiet ride, refined cabin feel, and a beautifully presented interior that stands out from typical listings.",
@@ -1532,14 +1543,17 @@ SAMPLE_BLOGS = [
 TESTIMONIALS = [
     {
         "name": "Kasun Ranaweera",
+        "rating": 5,
         "quote": "The team explained the car clearly, the condition matched the listing, and the buying process felt smooth from start to finish.",
     },
     {
         "name": "Kim Gatapia",
+        "rating": 5,
         "quote": "Everything was handled professionally and the prices felt realistic for the UAE used car market.",
     },
     {
         "name": "Aslam Mohammed",
+        "rating": 5,
         "quote": "I appreciated the transparency and the way the staff took time to answer every question before I decided.",
     },
 ]
@@ -1726,90 +1740,6 @@ def seed_sample_cars(force=False):
                 car.get("seller_phone", "+971582119936"),
                 car.get("seller_type", "Dealership"),
             ),
-        )
-
-    conn.commit()
-    conn.close()
-    return True
-
-
-def ensure_sample_sedan_replacement():
-    replacement = next(
-        (car for car in SAMPLE_CARS if car["title"] == "Toyota Camry SE 2018"),
-        None,
-    )
-    if not replacement:
-        return False
-
-    conn = get_db()
-    old_row = conn.execute(
-        "SELECT id FROM cars WHERE title = ?",
-        ("Nissan Altima SV",),
-    ).fetchone()
-    replacement_row = conn.execute(
-        "SELECT id FROM cars WHERE title = ?",
-        (replacement["title"],),
-    ).fetchone()
-
-    car_values = (
-        replacement["title"],
-        replacement["brand"],
-        replacement["model"],
-        replacement["year"],
-        replacement["price"],
-        replacement["mileage"],
-        replacement["description"],
-        replacement["image"],
-        replacement["category"],
-        replacement["location"],
-        replacement["fuel_type"],
-        replacement["transmission"],
-        replacement["condition"],
-        replacement["featured"],
-        replacement["status"],
-        replacement.get("seller_name", "CARWA Auto"),
-        replacement.get("seller_phone", "+971582119936"),
-        replacement.get("seller_type", "Dealership"),
-    )
-
-    if replacement_row:
-        target_id = replacement_row["id"]
-        conn.execute(
-            """
-            UPDATE cars
-            SET title = ?, brand = ?, model = ?, year = ?, price = ?, mileage = ?,
-                description = ?, image = ?, category = ?, location = ?, fuel_type = ?,
-                transmission = ?, condition = ?, featured = ?, status = ?,
-                seller_name = ?, seller_phone = ?, seller_type = ?
-            WHERE id = ?
-            """,
-            (*car_values, target_id),
-        )
-        if old_row and old_row["id"] != target_id:
-            conn.execute("DELETE FROM car_images WHERE car_id = ?", (old_row["id"],))
-            conn.execute("DELETE FROM wishlist WHERE car_id = ?", (old_row["id"],))
-            conn.execute("DELETE FROM leads WHERE car_id = ?", (old_row["id"],))
-            conn.execute("DELETE FROM cars WHERE id = ?", (old_row["id"],))
-    elif old_row:
-        conn.execute(
-            """
-            UPDATE cars
-            SET title = ?, brand = ?, model = ?, year = ?, price = ?, mileage = ?,
-                description = ?, image = ?, category = ?, location = ?, fuel_type = ?,
-                transmission = ?, condition = ?, featured = ?, status = ?,
-                seller_name = ?, seller_phone = ?, seller_type = ?
-            WHERE id = ?
-            """,
-            (*car_values, old_row["id"]),
-        )
-    else:
-        conn.execute(
-            """
-            INSERT INTO cars
-            (title, brand, model, year, price, mileage, description, image, category, location, fuel_type, transmission, condition, featured, status, seller_name, seller_phone, seller_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            car_values,
         )
 
     conn.commit()
@@ -4080,7 +4010,6 @@ def bootstrap_data():
     init_db()
     migrate_db()
     seed_sample_cars()
-    ensure_sample_sedan_replacement()
     prune_unwanted_listings()
     seed_sample_blogs()
     ensure_sunny_listing()
@@ -4115,7 +4044,15 @@ def bootstrap_data():
 
 def fetch_search_options():
     conn = get_db()
-    fuel_types = conn.execute("SELECT DISTINCT fuel_type FROM cars ORDER BY fuel_type").fetchall()
+    category_counts = fetch_available_option_counts(conn, "category")
+    brand_counts = fetch_available_option_counts(conn, "brand")
+    model_counts = fetch_available_option_counts(conn, "model")
+    location_counts = fetch_available_option_counts(conn, "location")
+    fuel_type_counts = fetch_available_option_counts(conn, "fuel_type")
+    transmission_counts = fetch_available_option_counts(conn, "transmission")
+    condition_counts = fetch_available_option_counts(conn, "condition")
+    year_counts = fetch_available_option_counts(conn, "year")
+
     models = conn.execute(
         """
         SELECT DISTINCT model
@@ -4134,11 +4071,29 @@ def fetch_search_options():
         ORDER BY brand, model
         """
     ).fetchall()
+    fuel_types = conn.execute(
+        """
+        SELECT DISTINCT fuel_type
+        FROM cars
+        WHERE status = 'Available' AND fuel_type IS NOT NULL AND fuel_type != ''
+        ORDER BY fuel_type
+        """
+    ).fetchall()
     transmissions = conn.execute(
-        "SELECT DISTINCT transmission FROM cars ORDER BY transmission"
+        """
+        SELECT DISTINCT transmission
+        FROM cars
+        WHERE status = 'Available' AND transmission IS NOT NULL AND transmission != ''
+        ORDER BY transmission
+        """
     ).fetchall()
     conditions = conn.execute(
-        "SELECT DISTINCT condition FROM cars ORDER BY condition"
+        """
+        SELECT DISTINCT condition
+        FROM cars
+        WHERE status = 'Available' AND condition IS NOT NULL AND condition != ''
+        ORDER BY condition
+        """
     ).fetchall()
     price_bounds = conn.execute(
         """
@@ -4154,23 +4109,59 @@ def fetch_search_options():
     for row in brand_models:
         models_by_brand.setdefault(row["brand"], []).append(row["model"])
 
+    category_options = sort_by_inventory(
+        ALL_CAR_CATEGORIES + list(category_counts.keys()),
+        category_counts,
+        preferred_order=ALL_CAR_CATEGORIES,
+    )
+    brand_options = sort_by_inventory(
+        ALL_CAR_BRANDS + list(brand_counts.keys()),
+        brand_counts,
+        preferred_order=ALL_CAR_BRANDS,
+    )
+    model_options = sort_by_inventory(
+        [row["model"] for row in models],
+        model_counts,
+    )
+    location_options = sort_by_inventory(
+        UAE_LOCATION_OPTIONS + list(location_counts.keys()),
+        location_counts,
+        preferred_order=UAE_LOCATION_OPTIONS,
+    )
+    year_options = sort_by_inventory(
+        list(year_counts.keys()),
+        year_counts,
+        descending_numeric=True,
+    )
+
     return {
-        "brands": ALL_CAR_BRANDS,
-        "models": [row["model"] for row in models],
+        "brands": brand_options,
+        "models": model_options,
         "models_by_brand": models_by_brand,
-        "categories": ALL_CAR_CATEGORIES,
-        "locations": [
-            "Abu Dhabi",
-            "Dubai",
-            "Sharjah",
-            "Ajman",
-            "Ras Al Khaimah",
-            "Fujairah",
-            "Umm Al Quwain",
-        ],
-        "fuel_types": [row["fuel_type"] for row in fuel_types],
-        "transmissions": [row["transmission"] for row in transmissions],
-        "conditions": [row["condition"] for row in conditions],
+        "categories": category_options,
+        "locations": location_options,
+        "years": year_options,
+        "fuel_types": sort_by_inventory(
+            FUEL_TYPE_OPTIONS + [row["fuel_type"] for row in fuel_types],
+            fuel_type_counts,
+            preferred_order=FUEL_TYPE_OPTIONS,
+        ),
+        "transmissions": sort_by_inventory(
+            TRANSMISSION_OPTIONS + [row["transmission"] for row in transmissions],
+            transmission_counts,
+            preferred_order=TRANSMISSION_OPTIONS,
+        ),
+        "conditions": sort_by_inventory([row["condition"] for row in conditions], condition_counts),
+        "counts": {
+            "categories": category_counts,
+            "brands": brand_counts,
+            "models": model_counts,
+            "locations": location_counts,
+            "years": year_counts,
+            "fuel_types": fuel_type_counts,
+            "transmissions": transmission_counts,
+            "conditions": condition_counts,
+        },
         "price_floor": price_floor,
         "price_slider_floor": SEARCH_PRICE_MIN,
         "price_ceiling": max(price_floor, price_ceiling),
@@ -4294,6 +4285,52 @@ def fetch_car_options():
     return options
 
 
+def fetch_available_option_counts(conn, column):
+    rows = conn.execute(
+        f"""
+        SELECT {column} AS value, COUNT(*) AS total
+        FROM cars
+        WHERE status = 'Available'
+            AND {column} IS NOT NULL
+            AND {column} != ''
+        GROUP BY {column}
+        """,
+    ).fetchall()
+    return {row["value"]: row["total"] for row in rows}
+
+
+def unique_in_order(values):
+    unique_values = []
+    seen = set()
+    for value in values:
+        if value in seen:
+            continue
+        seen.add(value)
+        unique_values.append(value)
+    return unique_values
+
+
+def sort_by_inventory(options, counts, preferred_order=None, descending_numeric=False):
+    preferred_order = preferred_order or []
+    preferred_rank = {value: index for index, value in enumerate(preferred_order)}
+    fallback_rank = {value: index for index, value in enumerate(options)}
+
+    def option_key(option):
+        total = counts.get(option, 0)
+        if descending_numeric:
+            secondary = -int(option)
+        else:
+            secondary = preferred_rank.get(option, len(preferred_order) + fallback_rank.get(option, 0))
+        return (
+            total == 0,
+            -total,
+            secondary,
+            str(option).lower(),
+        )
+
+    return sorted(unique_in_order(options), key=option_key)
+
+
 def build_popular_categories(category_rows):
     category_totals = {
         row["category"]: row["total"]
@@ -4356,7 +4393,6 @@ def build_car_search_query(args):
     brand = args.get("brand", "").strip()
     category = args.get("category", "").strip()
     location = args.get("location", "").strip()
-    location_query = args.get("location_query", "").strip()
     model = args.get("model", "").strip()
     year = args.get("year", "").strip()
     price = args.get("price", "").strip()
@@ -4383,10 +4419,6 @@ def build_car_search_query(args):
     if location and location not in {"Any Location", "All"}:
         clauses.append("location = ?")
         params.append(location)
-
-    if location_query:
-        clauses.append("LOWER(location) LIKE ?")
-        params.append(f"%{location_query.lower()}%")
 
     if model:
         clauses.append("LOWER(model) LIKE ?")
@@ -4428,7 +4460,8 @@ def build_car_search_query(args):
         "mileage_low": "mileage ASC, id DESC",
         "latest": "featured DESC, id DESC",
     }
-    query += " ORDER BY " + sort_map.get(sort_by, "featured DESC, id DESC")
+    last_listing_clause = "CASE WHEN title = '2009 Nissan Sunny 1.6 GCC Specs' THEN 1 ELSE 0 END ASC"
+    query += " ORDER BY " + last_listing_clause + ", " + sort_map.get(sort_by, "featured DESC, id DESC")
 
     return query, params
 

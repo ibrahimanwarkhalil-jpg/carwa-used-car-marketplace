@@ -48,7 +48,7 @@
 <div class="search-field">
 <label>Brand</label>
 <div class="search-select-wrap">
-<select name="brand" class="form-control search-select">
+<select name="brand" class="form-control search-select" data-home-brand>
 <option value="">All</option>
 {% for brand in search_options.brands %}
 <option value="{{ brand }}">{{ brand }}</option>
@@ -60,7 +60,7 @@
 <div class="search-field">
 <label>Model</label>
 <div class="search-select-wrap">
-<select name="model" class="form-control search-select">
+<select name="model" class="form-control search-select" data-home-model>
 <option value="">All</option>
 {% for model in search_options.models %}
 <option value="{{ model }}">{{ model }}</option>
@@ -93,17 +93,6 @@
 </div>
 </div>
 </form>
-
-<div class="hero-tool-links">
-<a href="/recommendations" class="btn hero-tool-button">
-<i class="fa-solid fa-wand-magic-sparkles"></i>
-Get Recommendations
-</a>
-<a href="/evaluate" class="btn hero-tool-button">
-<i class="fa-solid fa-calculator"></i>
-Evaluate Price
-</a>
-</div>
 </div>
 
 <div class="stats-strip">
@@ -231,6 +220,36 @@ document.addEventListener("DOMContentLoaded", function () {
   const categoryCarousel = document.querySelector("[data-category-carousel]");
   const categoryPrev = document.querySelector("[data-category-prev]");
   const categoryNext = document.querySelector("[data-category-next]");
+  const homeBrandSelect = document.querySelector("[data-home-brand]");
+  const homeModelSelect = document.querySelector("[data-home-model]");
+  const modelsByBrand = {{ search_options.models_by_brand | tojson }};
+  const allModels = {{ search_options.models | tojson }};
+
+  if (homeBrandSelect && homeModelSelect) {
+    function populateHomeModels() {
+      const selectedBrand = homeBrandSelect.value;
+      const selectedModel = homeModelSelect.value;
+      const models = selectedBrand ? (modelsByBrand[selectedBrand] || []) : allModels;
+
+      homeModelSelect.innerHTML = "";
+      homeModelSelect.append(new Option("All", ""));
+
+      models.forEach(function (model) {
+        homeModelSelect.append(new Option(model, model));
+      });
+
+      if (selectedModel && models.includes(selectedModel)) {
+        homeModelSelect.value = selectedModel;
+      }
+    }
+
+    homeBrandSelect.addEventListener("change", function () {
+      homeModelSelect.value = "";
+      populateHomeModels();
+    });
+
+    populateHomeModels();
+  }
 
   if (categoryCarousel) {
     function moveCategories(direction) {
@@ -418,7 +437,11 @@ document.addEventListener("DOMContentLoaded", function () {
 <div class="testimonial-grid">
 {% for testimonial in testimonials %}
 <article class="testimonial-card">
-<div class="testimonial-stars">5 star</div>
+<div class="testimonial-stars" aria-label="Rated {{ testimonial.rating|default(5) }} out of five">
+<span class="star-icons" aria-hidden="true">
+{% for star in range(testimonial.rating|default(5)) %}<span>&#9733;</span>{% endfor %}
+</span>
+</div>
 <p>{{ testimonial.quote }}</p>
 <strong>{{ testimonial.name }}</strong>
 </article>

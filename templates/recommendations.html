@@ -15,16 +15,28 @@
 
 <form action="/recommendations" method="GET" class="filter-form">
 <label>Budget (AED)</label>
-<select name="budget" class="form-control">
 {% set selected_budget = current_preferences.get("budget", "") %}
+{% set selected_budget_number = ([selected_budget|int, search_options.price_ceiling]|min) if selected_budget else search_options.price_ceiling %}
+<select class="form-control" data-budget-preset>
 <option value="" {% if not selected_budget %}selected{% endif %}>Any Budget</option>
-<option value="20000" {% if selected_budget == "20000" %}selected{% endif %}>Under AED 20,000</option>
-<option value="40000" {% if selected_budget == "40000" %}selected{% endif %}>AED 20,000 - 40,000</option>
-<option value="60000" {% if selected_budget == "60000" %}selected{% endif %}>AED 40,000 - 60,000</option>
-<option value="80000" {% if selected_budget == "80000" %}selected{% endif %}>AED 60,000 - 80,000</option>
-<option value="100000" {% if selected_budget == "100000" %}selected{% endif %}>AED 80,000 - 100,000</option>
-<option value="999999" {% if selected_budget == "999999" %}selected{% endif %}>AED 100,000+</option>
+<option value="20000" {% if selected_budget == "20000" %}selected{% endif %}>Up to AED 20,000</option>
+<option value="40000" {% if selected_budget == "40000" %}selected{% endif %}>Up to AED 40,000</option>
+<option value="60000" {% if selected_budget == "60000" %}selected{% endif %}>Up to AED 60,000</option>
+<option value="80000" {% if selected_budget == "80000" %}selected{% endif %}>Up to AED 80,000</option>
+<option value="100000" {% if selected_budget == "100000" %}selected{% endif %}>Up to AED 100,000</option>
+<option value="{{ search_options.price_ceiling }}" {% if selected_budget == search_options.price_ceiling|string %}selected{% endif %}>Up to AED {{ "{:,}".format(search_options.price_ceiling) }}</option>
+<option value="custom" hidden>Custom Budget</option>
 </select>
+<div class="price-range-card filter-price-range-card budget-range-card" data-budget-any="{{ 'false' if selected_budget else 'true' }}">
+<div class="range-shell">
+<div class="range-progress" data-budget-progress></div>
+<input type="range" class="price-range-max" min="{{ search_options.price_slider_floor }}" max="{{ search_options.price_ceiling }}" step="1000" value="{{ selected_budget_number }}" data-budget-range aria-label="Maximum budget in AED">
+</div>
+<div class="price-range-text budget-range-text">
+<span data-budget-display>{% if selected_budget %}Up to AED {{ "{:,}".format(selected_budget_number) }}{% else %}Any Budget{% endif %}</span>
+</div>
+<input type="hidden" name="budget" value="{{ selected_budget }}" data-budget-field>
+</div>
 
 <label>Body Type</label>
 <select name="category" class="form-control">
@@ -53,13 +65,17 @@
 <label>Fuel Type</label>
 <select name="fuel_type" class="form-control">
 {% set selected_fuel_type = current_preferences.get("fuel_type", "Petrol") or "Petrol" %}
-<option value="Petrol" {% if selected_fuel_type == "Petrol" %}selected{% endif %}>Petrol</option>
+{% for fuel_type in search_options.fuel_types %}
+<option value="{{ fuel_type }}" {% if selected_fuel_type == fuel_type %}selected{% endif %}>{{ fuel_type }}</option>
+{% endfor %}
 </select>
 
 <label>Transmission</label>
 <select name="transmission" class="form-control">
 {% set selected_transmission = current_preferences.get("transmission", "Automatic") or "Automatic" %}
-<option value="Automatic" {% if selected_transmission == "Automatic" %}selected{% endif %}>Automatic</option>
+{% for transmission in search_options.transmissions %}
+<option value="{{ transmission }}" {% if selected_transmission == transmission %}selected{% endif %}>{{ transmission }}</option>
+{% endfor %}
 </select>
 
 <label>Minimum Year</label>
@@ -162,5 +178,82 @@ AED {{ "{:,}".format(-car.budget_gap) }} over budget
 </div>
 </div>
 </section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const budgetCard = document.querySelector(".budget-range-card");
+  if (!budgetCard) {
+    return;
+  }
+
+  const budgetRange = budgetCard.querySelector("[data-budget-range]");
+  const budgetField = budgetCard.querySelector("[data-budget-field]");
+  const budgetDisplay = budgetCard.querySelector("[data-budget-display]");
+  const budgetProgress = budgetCard.querySelector("[data-budget-progress]");
+  const budgetPreset = document.querySelector("[data-budget-preset]");
+  let isAnyBudget = budgetCard.dataset.budgetAny === "true";
+
+  function formatPrice(value) {
+    return Number(value).toLocaleString();
+  }
+
+  function syncBudget() {
+    const value = Number(budgetRange.value);
+    const min = Number(budgetRange.min);
+    const max = Number(budgetRange.max);
+    const range = max - min;
+    const rightPercent = range > 0 ? 100 - ((value - min) / range) * 100 : 0;
+
+    budgetProgress.style.left = "0%";
+    budgetProgress.style.right = rightPercent + "%";
+
+    if (isAnyBudget) {
+      budgetField.value = "";
+      budgetDisplay.textContent = "Any Budget";
+      if (budgetPreset) {
+        budgetPreset.value = "";
+      }
+      return;
+    }
+
+    budgetField.value = String(value);
+    budgetDisplay.textContent = "Up to AED " + formatPrice(value);
+
+    if (budgetPreset) {
+      const hasPreset = Array.from(budgetPreset.options).some(function (option) {
+        return option.value === String(value);
+      });
+      budgetPreset.value = hasPreset ? String(value) : "custom";
+    }
+  }
+
+  budgetRange.addEventListener("input", function () {
+    isAnyBudget = false;
+    budgetCard.dataset.budgetAny = "false";
+    syncBudget();
+  });
+
+  if (budgetPreset) {
+    budgetPreset.addEventListener("change", function () {
+      if (!budgetPreset.value) {
+        isAnyBudget = true;
+        budgetCard.dataset.budgetAny = "true";
+        budgetRange.value = budgetRange.max;
+        syncBudget();
+        return;
+      }
+
+      if (budgetPreset.value !== "custom") {
+        isAnyBudget = false;
+        budgetCard.dataset.budgetAny = "false";
+        budgetRange.value = budgetPreset.value;
+        syncBudget();
+      }
+    });
+  }
+
+  syncBudget();
+});
+</script>
 
 {% endblock %}

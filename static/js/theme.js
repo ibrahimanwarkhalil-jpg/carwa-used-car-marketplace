@@ -14,6 +14,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (icon) {
       icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
     }
+    if (toggle) {
+      const actionLabel = isDark ? "Switch to day mode" : "Switch to dark mode";
+      toggle.setAttribute("aria-label", actionLabel);
+      toggle.setAttribute("title", actionLabel);
+    }
   }
 
   const savedTheme = localStorage.getItem("carwa-theme") || "light";

@@ -29,11 +29,8 @@
 {% endfor %}
 </select>
 
-<label>Search By Location</label>
-<input name="location_query" class="form-control" value="{{ current_filters.get('location_query', '') }}" placeholder="Dubai, Sharjah, Abu Dhabi">
-
 <label>Brand</label>
-<select name="brand" class="form-control">
+<select name="brand" class="form-control" data-inventory-brand>
 <option value="">Any Brand</option>
 {% for brand in search_options.brands %}
 <option value="{{ brand }}" {% if current_filters.get("brand") == brand %}selected{% endif %}>{{ brand }}</option>
@@ -41,7 +38,7 @@
 </select>
 
 <label>Model</label>
-<select name="model" class="form-control">
+<select name="model" class="form-control" data-inventory-model data-current-model="{{ current_filters.get('model', '') }}">
 <option value="">Any Model</option>
 {% for model in search_options.models %}
 <option value="{{ model }}" {% if current_filters.get("model") == model %}selected{% endif %}>{{ model }}</option>
@@ -49,27 +46,55 @@
 </select>
 
 <label>Year</label>
-<input name="year" class="form-control" value="{{ current_filters.get('year', '') }}" placeholder="2020">
+<select name="year" class="form-control">
+<option value="">Any Year</option>
+{% for year in search_options.years %}
+<option value="{{ year }}" {% if current_filters.get("year") == year|string %}selected{% endif %}>{{ year }}</option>
+{% endfor %}
+</select>
 
 <label>Price Range (AED)</label>
-<div class="price-input-grid">
-<input name="min_price" class="form-control" value="{{ current_filters.get('min_price', '') }}" placeholder="{{ search_options.price_floor }}">
-<input name="max_price" class="form-control" value="{{ current_filters.get('max_price', current_filters.get('price', '')) }}" placeholder="{{ search_options.price_ceiling }}">
+{% set selected_min_price = current_filters.get('min_price', '') %}
+{% set selected_max_price = current_filters.get('max_price', current_filters.get('price', '')) %}
+{% set has_price_filter = selected_min_price or selected_max_price %}
+<select class="form-control" data-price-preset>
+<option value="" {% if not has_price_filter %}selected{% endif %}>Any Price</option>
+<option value="{{ search_options.price_slider_floor }}-10000">Under AED 10,000</option>
+<option value="10000-20000">AED 10,000 - 20,000</option>
+<option value="20000-40000">AED 20,000 - 40,000</option>
+<option value="40000-60000">AED 40,000 - 60,000</option>
+<option value="60000-100000">AED 60,000 - 100,000</option>
+<option value="100000-{{ search_options.price_ceiling }}">AED 100,000+</option>
+<option value="custom" hidden>Custom Range</option>
+</select>
+<div class="price-range-card filter-price-range-card" data-price-floor="{{ search_options.price_slider_floor }}" data-price-ceiling="{{ search_options.price_ceiling }}" data-price-min-gap="1000" data-price-any="{{ 'false' if has_price_filter else 'true' }}">
+<div class="range-shell">
+<div class="range-progress" data-price-progress></div>
+<input type="range" class="price-range-min" min="{{ search_options.price_slider_floor }}" max="{{ search_options.price_ceiling }}" step="1000" value="{{ selected_min_price or search_options.price_slider_floor }}" data-price-min aria-label="Minimum price in AED">
+<input type="range" class="price-range-max" min="{{ search_options.price_slider_floor }}" max="{{ search_options.price_ceiling }}" step="1000" value="{{ selected_max_price or search_options.price_ceiling }}" data-price-max aria-label="Maximum price in AED">
+</div>
+<div class="price-range-text">
+<span data-price-min-display>{% if has_price_filter %}{{ "{:,}".format((selected_min_price or search_options.price_slider_floor)|int) }}{% else %}Any{% endif %}</span>
+<span>-</span>
+<span data-price-max-display>{% if has_price_filter %}{{ "{:,}".format((selected_max_price or search_options.price_ceiling)|int) }}{% else %}Price{% endif %}</span>
+</div>
+<input type="hidden" name="min_price" value="{{ selected_min_price if has_price_filter else '' }}" data-price-min-field>
+<input type="hidden" name="max_price" value="{{ selected_max_price if has_price_filter else '' }}" data-price-max-field>
 </div>
 
 <label>Fuel Type</label>
 <select name="fuel_type" class="form-control">
-<option value="">Any Fuel Type</option>
+{% set selected_fuel_type = current_filters.get("fuel_type", "Petrol") or "Petrol" %}
 {% for fuel_type in search_options.fuel_types %}
-<option value="{{ fuel_type }}" {% if current_filters.get("fuel_type") == fuel_type %}selected{% endif %}>{{ fuel_type }}</option>
+<option value="{{ fuel_type }}" {% if selected_fuel_type == fuel_type %}selected{% endif %}>{{ fuel_type }}</option>
 {% endfor %}
 </select>
 
 <label>Transmission</label>
 <select name="transmission" class="form-control">
-<option value="">Any Transmission</option>
+{% set selected_transmission = current_filters.get("transmission", "Automatic") or "Automatic" %}
 {% for transmission in search_options.transmissions %}
-<option value="{{ transmission }}" {% if current_filters.get("transmission") == transmission %}selected{% endif %}>{{ transmission }}</option>
+<option value="{{ transmission }}" {% if selected_transmission == transmission %}selected{% endif %}>{{ transmission }}</option>
 {% endfor %}
 </select>
 
@@ -174,7 +199,140 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
+  const brandSelect = document.querySelector("[data-inventory-brand]");
+  const modelSelect = document.querySelector("[data-inventory-model]");
+  const modelsByBrand = {{ search_options.models_by_brand | tojson }};
+  const allModels = {{ search_options.models | tojson }};
+  const priceCard = document.querySelector(".filter-price-range-card");
+  const pricePreset = document.querySelector("[data-price-preset]");
   const rotators = document.querySelectorAll(".listing-rotator");
+
+  if (brandSelect && modelSelect) {
+    function populateModels() {
+      const selectedBrand = brandSelect.value;
+      const selectedModel = modelSelect.dataset.currentModel || modelSelect.value;
+      const models = selectedBrand ? (modelsByBrand[selectedBrand] || []) : allModels;
+
+      modelSelect.innerHTML = "";
+      modelSelect.append(new Option("Any Model", ""));
+
+      models.forEach(function (model) {
+        modelSelect.append(new Option(model, model));
+      });
+
+      if (selectedModel && !models.includes(selectedModel)) {
+        modelSelect.append(new Option(selectedModel, selectedModel));
+      }
+
+      modelSelect.value = selectedModel || "";
+      modelSelect.dataset.currentModel = "";
+    }
+
+    brandSelect.addEventListener("change", function () {
+      modelSelect.dataset.currentModel = "";
+      populateModels();
+    });
+
+    populateModels();
+  }
+
+  if (priceCard) {
+    const minInput = priceCard.querySelector("[data-price-min]");
+    const maxInput = priceCard.querySelector("[data-price-max]");
+    const minField = priceCard.querySelector("[data-price-min-field]");
+    const maxField = priceCard.querySelector("[data-price-max-field]");
+    const minDisplay = priceCard.querySelector("[data-price-min-display]");
+    const maxDisplay = priceCard.querySelector("[data-price-max-display]");
+    const progress = priceCard.querySelector("[data-price-progress]");
+    const minGap = Number(priceCard.dataset.priceMinGap || "1000");
+    let isAnyPrice = priceCard.dataset.priceAny === "true";
+
+    function formatPrice(value) {
+      return Number(value).toLocaleString();
+    }
+
+    function setPresetFromValues() {
+      if (!pricePreset) {
+        return;
+      }
+
+      const value = isAnyPrice ? "" : minField.value + "-" + maxField.value;
+      const hasPreset = Array.from(pricePreset.options).some(function (option) {
+        return option.value === value;
+      });
+      pricePreset.value = hasPreset ? value : "custom";
+    }
+
+    function syncPriceInputs() {
+      const minValue = Number(minInput.value);
+      const maxValue = Number(maxInput.value);
+      const range = Number(maxInput.max) - Number(maxInput.min);
+      const leftPercent = range > 0 ? ((minValue - Number(minInput.min)) / range) * 100 : 0;
+      const rightPercent = range > 0 ? 100 - ((maxValue - Number(maxInput.min)) / range) * 100 : 0;
+
+      progress.style.left = leftPercent + "%";
+      progress.style.right = rightPercent + "%";
+
+      if (isAnyPrice) {
+        minField.value = "";
+        maxField.value = "";
+        minDisplay.textContent = "Any";
+        maxDisplay.textContent = "Price";
+      } else {
+        minField.value = String(minValue);
+        maxField.value = String(maxValue);
+        minDisplay.textContent = formatPrice(minValue);
+        maxDisplay.textContent = formatPrice(maxValue);
+      }
+
+      setPresetFromValues();
+    }
+
+    function activateCustomPrice() {
+      isAnyPrice = false;
+      priceCard.dataset.priceAny = "false";
+    }
+
+    minInput.addEventListener("input", function () {
+      activateCustomPrice();
+      if (Number(minInput.value) > Number(maxInput.value) - minGap) {
+        minInput.value = String(Number(maxInput.value) - minGap);
+      }
+      syncPriceInputs();
+    });
+
+    maxInput.addEventListener("input", function () {
+      activateCustomPrice();
+      if (Number(maxInput.value) < Number(minInput.value) + minGap) {
+        maxInput.value = String(Number(minInput.value) + minGap);
+      }
+      syncPriceInputs();
+    });
+
+    if (pricePreset) {
+      pricePreset.addEventListener("change", function () {
+        if (!pricePreset.value) {
+          isAnyPrice = true;
+          priceCard.dataset.priceAny = "true";
+          minInput.value = minInput.min;
+          maxInput.value = maxInput.max;
+          syncPriceInputs();
+          return;
+        }
+
+        const parts = pricePreset.value.split("-");
+        if (parts.length === 2) {
+          isAnyPrice = false;
+          priceCard.dataset.priceAny = "false";
+          minInput.value = parts[0];
+          maxInput.value = parts[1];
+          syncPriceInputs();
+        }
+      });
+    }
+
+    syncPriceInputs();
+  }
 
   rotators.forEach(function (rotator) {
     const imageEl = rotator.querySelector(".featured-rotator-image");

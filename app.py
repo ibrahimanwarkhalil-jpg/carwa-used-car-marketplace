@@ -4,7 +4,7 @@ import shutil
 import sqlite3
 from urllib.parse import urlencode
 
-from flask import Flask, redirect, render_template, request, session
+from flask import Flask, redirect, render_template, request, send_from_directory, session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
@@ -35,6 +35,15 @@ UPLOAD_FOLDER = os.environ.get(
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+
+@app.route("/favicon.ico")
+def favicon():
+    return send_from_directory(
+        os.path.join(app.root_path, "static/uploads/logo"),
+        "logo.png",
+        mimetype="image/png",
+    )
 
 DEFAULT_ADMIN = {
     "username": "admin",

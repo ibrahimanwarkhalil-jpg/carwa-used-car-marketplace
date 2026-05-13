@@ -121,6 +121,8 @@ height:48px;
 object-fit:contain;
 border-radius:0;
 box-shadow:none;
+box-sizing:border-box;
+transition:background 0.2s ease, box-shadow 0.2s ease, padding 0.2s ease;
 }
 
 .site-logo-mark{
@@ -135,7 +137,15 @@ color:#ff9638;
 text-shadow:0 0 18px rgba(255,150,56,0.22);
 }
 
+html[data-theme="dark"] .site-logo-img{
+padding:0;
+border-radius:0;
+background:transparent;
+filter:drop-shadow(0 0 10px rgba(255,150,56,0.38)) drop-shadow(0 2px 5px rgba(255,255,255,0.18));
+}
+
 html[data-theme="dark"] .site-navbar{
+background:linear-gradient(90deg, rgba(25,43,64,0.98) 0%, rgba(11,17,26,0.96) 42%, rgba(11,17,26,0.96) 100%) !important;
 box-shadow:0 14px 42px rgba(0,0,0,0.28);
 }
 

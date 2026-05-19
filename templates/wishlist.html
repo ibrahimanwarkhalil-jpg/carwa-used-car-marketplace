@@ -4,9 +4,17 @@
 
 <section class="page-shell">
 <div class="container">
-<div class="section-head">
+<div class="section-head section-head-inline">
+<div>
 <p class="eyebrow">Saved Inventory</p>
 <h2>My Wishlist</h2>
+</div>
+{% if cars %}
+<div class="wishlist-page-actions">
+<span class="results-count">{{ cars|length }} saved {{ 'car' if cars|length == 1 else 'cars' }}</span>
+<a href="/cars" class="btn btn-outline-secondary">Browse Cars</a>
+</div>
+{% endif %}
 </div>
 
 {% if cars %}
@@ -26,7 +34,16 @@
 <p class="car-specs">{{ car.year }} | {{ "{:,}".format(car.mileage) }} km</p>
 <div class="car-card-footer">
 <strong>AED {{ "{:,}".format(car.price) }}</strong>
+<div class="card-actions">
 <a href="/car/{{ car.id }}" class="btn btn-outline-dark">View</a>
+<form action="/wishlist/{{ car.id }}/remove" method="POST" class="wishlist-action-form">
+<input type="hidden" name="next" value="/wishlist">
+<button type="submit" class="btn btn-outline-danger">
+<i class="fa-solid fa-heart-crack"></i>
+Remove
+</button>
+</form>
+</div>
 </div>
 </div>
 </div>

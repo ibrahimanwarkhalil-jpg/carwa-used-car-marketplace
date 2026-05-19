@@ -90,9 +90,28 @@ Your test-drive request has been submitted.
 <p class="detail-description">{{ car.description }}</p>
 
 <div class="detail-actions">
-<a href="/wishlist/{{ car.id }}" class="btn btn-dark">Save To Wishlist</a>
+{% if is_saved %}
+<form action="/wishlist/{{ car.id }}/remove" method="POST" class="wishlist-action-form">
+<input type="hidden" name="next" value="{{ request.path }}">
+<button type="submit" class="btn btn-outline-danger">
+<i class="fa-solid fa-heart-crack"></i>
+Remove From Wishlist
+</button>
+</form>
+{% else %}
+<form action="/wishlist/{{ car.id }}" method="POST" class="wishlist-action-form">
+<input type="hidden" name="next" value="{{ request.path }}">
+<button type="submit" class="btn btn-dark">
+<i class="fa-regular fa-heart"></i>
+Save To Wishlist
+</button>
+</form>
+{% endif %}
 <a href="https://wa.me/971582119936?text=I%20am%20interested%20in%20{{ car.title | replace(' ', '%20') }}" class="btn btn-outline-dark">Contact On WhatsApp</a>
 <a href="/finance?car_id={{ car.id }}" class="btn btn-outline-dark">Finance</a>
+<button type="button" class="btn btn-outline-dark" data-compare-add data-car-id="{{ car.id }}" data-car-title="{{ car.title }}">
+Compare
+</button>
 {% if session.get("admin_username") %}
 <a href="/car/{{ car.id }}/edit" class="btn btn-outline-secondary">Edit Listing</a>
 {% endif %}
@@ -107,6 +126,8 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 </div>
 
 {% set buyer_profile = session.get("buyer_profile") %}
+{% set contact_data = lead_form_data.get("contact", {}) %}
+{% set test_drive_data = lead_form_data.get("test_drive", {}) %}
 <div class="row g-3 mt-4 lead-form-grid">
 <div class="col-md-6">
 <div class="form-shell lead-form-shell h-100">
@@ -115,7 +136,16 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 <p>Ask a question about this vehicle.</p>
 <button type="button" class="btn btn-dark lead-open-button" data-lead-toggle="contactLeadForm">Open Contact Form</button>
 </div>
-<form method="POST" action="/lead/contact/{{ car.id }}" class="row g-3 lead-hidden-form" id="contactLeadForm" hidden>
+<form method="POST" action="/lead/contact/{{ car.id }}" class="row g-3 lead-hidden-form" id="contactLeadForm" hidden novalidate data-lead-form>
+{% if lead_errors.get("contact") %}
+<div class="col-12">
+<div class="finance-error-list">
+{% for error in lead_errors.contact %}
+<div>{{ error }}</div>
+{% endfor %}
+</div>
+</div>
+{% endif %}
 {% if buyer_profile %}
 <div class="col-12">
 <div class="lead-profile-note">
@@ -129,17 +159,18 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 </div>
 {% else %}
 <div class="col-12">
-<input class="form-control" name="name" placeholder="Your Name" required>
+<input class="form-control" name="name" value="{{ contact_data.get('name', '') }}" placeholder="Your Name" autocomplete="name" required>
 </div>
 <div class="col-12">
-<input class="form-control" name="email" placeholder="Email Address" required>
+<input class="form-control" type="email" name="email" value="{{ contact_data.get('email', '') }}" placeholder="Email Address" autocomplete="email" required>
 </div>
 <div class="col-12">
-<input class="form-control" name="phone" placeholder="Phone Number" required>
+<input class="form-control" name="phone" value="{{ contact_data.get('phone', '05') }}" placeholder="05XXXXXXXX" inputmode="numeric" pattern="05[0-9]{8}" maxlength="10" minlength="10" autocomplete="tel" data-phone-input required>
+<small class="form-hint">UAE mobile number only, for example 05XXXXXXXX.</small>
 </div>
 {% endif %}
 <div class="col-12">
-<textarea class="form-control" name="message" rows="4" placeholder="Tell us what you want to know"></textarea>
+<textarea class="form-control" name="message" rows="4" placeholder="Tell us what you want to know" required>{{ contact_data.get('message', '') }}</textarea>
 </div>
 <div class="col-12">
 <button class="btn btn-dark lead-submit-button">Send Inquiry</button>
@@ -155,7 +186,16 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 <p>Choose a preferred appointment date and time.</p>
 <button type="button" class="btn btn-dark lead-open-button" data-lead-toggle="testDriveLeadForm">Choose Appointment</button>
 </div>
-<form method="POST" action="/lead/book/{{ car.id }}" class="row g-3 lead-hidden-form" id="testDriveLeadForm" hidden>
+<form method="POST" action="/lead/book/{{ car.id }}" class="row g-3 lead-hidden-form" id="testDriveLeadForm" hidden novalidate data-lead-form>
+{% if lead_errors.get("test_drive") %}
+<div class="col-12">
+<div class="finance-error-list">
+{% for error in lead_errors.test_drive %}
+<div>{{ error }}</div>
+{% endfor %}
+</div>
+</div>
+{% endif %}
 {% if buyer_profile %}
 <div class="col-12">
 <div class="lead-profile-note">
@@ -169,20 +209,21 @@ Ask the admin to use the Edit Listing page to replace the current main picture o
 </div>
 {% else %}
 <div class="col-12">
-<input class="form-control" name="name" placeholder="Your Name" required>
+<input class="form-control" name="name" value="{{ test_drive_data.get('name', '') }}" placeholder="Your Name" autocomplete="name" required>
 </div>
 <div class="col-12">
-<input class="form-control" name="email" placeholder="Email Address" required>
+<input class="form-control" type="email" name="email" value="{{ test_drive_data.get('email', '') }}" placeholder="Email Address" autocomplete="email" required>
 </div>
 <div class="col-12">
-<input class="form-control" name="phone" placeholder="Phone Number" required>
+<input class="form-control" name="phone" value="{{ test_drive_data.get('phone', '05') }}" placeholder="05XXXXXXXX" inputmode="numeric" pattern="05[0-9]{8}" maxlength="10" minlength="10" autocomplete="tel" data-phone-input required>
+<small class="form-hint">UAE mobile number only, for example 05XXXXXXXX.</small>
 </div>
 {% endif %}
 <div class="col-6">
-<input class="form-control" type="date" name="preferred_date" required>
+<input class="form-control" type="date" name="preferred_date" value="{{ test_drive_data.get('preferred_date', '') }}" min="{{ today_date }}" required>
 </div>
 <div class="col-6">
-<input class="form-control" type="time" name="preferred_time" required>
+<input class="form-control" type="time" name="preferred_time" value="{{ test_drive_data.get('preferred_time', '') }}" required>
 </div>
 <div class="col-12">
 <button class="btn btn-dark lead-submit-button">Request Test Drive</button>
@@ -240,6 +281,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     button.dataset.closedLabel = button.textContent;
   });
+
+  const activeLead = new URLSearchParams(window.location.search).get("lead");
+  const activeFormId = activeLead === "contact" ? "contactLeadForm" : activeLead === "test_drive" ? "testDriveLeadForm" : null;
+  if (activeFormId) {
+    const activeForm = document.getElementById(activeFormId);
+    const activeButton = document.querySelector('[data-lead-toggle="' + activeFormId + '"]');
+    if (activeForm) {
+      activeForm.hidden = false;
+    }
+    if (activeButton) {
+      activeButton.textContent = "Hide Form";
+    }
+  }
 
   const viewer = document.querySelector(".detail-image-viewer");
   const mainImage = document.getElementById("mainCarImage");
@@ -314,5 +368,6 @@ document.addEventListener("DOMContentLoaded", function () {
   startGalleryAutoPlay();
 });
 </script>
+<script src="/static/js/lead-forms.js?v=1"></script>
 
 {% endblock %}

@@ -24,7 +24,7 @@
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 
-<link rel="stylesheet" href="/static/css/style.css?v=37">
+<link rel="stylesheet" href="/static/css/style.css?v=42">
 
 </head>
 
@@ -87,6 +87,7 @@
 <li class="nav-item">
 <a class="nav-link" href="/finance">Finance</a>
 </li>
+
 {% endif %}
 
 </ul>
@@ -94,6 +95,19 @@
 <!-- RIGHT BUTTONS -->
 
 <div class="nav-actions">
+{% if not is_admin_context %}
+<a href="/compare" class="btn btn-outline-secondary nav-pill-button nav-icon-button nav-tooltip" aria-label="Open compare tool" title="Compare" data-tooltip="Compare">
+<i class="fa-solid fa-code-compare"></i>
+</a>
+
+<a href="/wishlist" class="btn btn-outline-danger nav-pill-button nav-icon-button nav-wishlist-button nav-tooltip" aria-label="Open wishlist" title="Wishlist" data-tooltip="Wishlist">
+<i class="{{ 'fa-solid' if wishlist_count else 'fa-regular' }} fa-heart"></i>
+{% if wishlist_count %}
+<span class="nav-icon-count">{{ wishlist_count }}</span>
+{% endif %}
+</a>
+{% endif %}
+
 <div class="nav-action-group nav-account-group">
 
 {% if session.get("admin_username") %}
@@ -118,7 +132,7 @@ Login
 </a>
 {% endif %}
 
-<button type="button" class="btn btn-outline-secondary theme-toggle nav-pill-button" data-theme-toggle aria-label="Switch color theme">
+<button type="button" class="btn btn-outline-secondary theme-toggle nav-pill-button nav-tooltip" data-theme-toggle aria-label="Switch color theme" title="Switch color theme" data-tooltip="Switch color theme">
 <i class="fa-solid fa-moon" data-theme-icon></i>
 </button>
 </div>
@@ -178,8 +192,10 @@ Evaluate
 
 <script src="/static/js/ads.js?v=5"></script>
 <script src="/static/js/card-links.js"></script>
-<script src="/static/js/theme.js?v=2"></script>
+<script src="/static/js/compare.js?v=2"></script>
+<script src="/static/js/theme.js?v=3"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
 
 </body>
 

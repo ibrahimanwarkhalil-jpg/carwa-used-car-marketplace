@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import re
 import shutil
 import sqlite3
 from urllib.parse import urlencode
@@ -1715,6 +1716,35 @@ def migrate_db():
             "seller_type": "TEXT DEFAULT 'Dealership'",
         },
     )
+    migrate_wishlist_uniqueness()
+
+
+def migrate_wishlist_uniqueness():
+    conn = get_db()
+    conn.execute(
+        """
+        DELETE FROM wishlist
+        WHERE id NOT IN (
+            SELECT MIN(id)
+            FROM wishlist
+            GROUP BY car_id
+        )
+        """
+    )
+    conn.execute(
+        """
+        DELETE FROM wishlist
+        WHERE car_id NOT IN (
+            SELECT id
+            FROM cars
+        )
+        """
+    )
+    conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_wishlist_car_id ON wishlist(car_id)"
+    )
+    conn.commit()
+    conn.close()
 
 
 def seed_sample_cars(force=False):
@@ -4511,6 +4541,49 @@ def normalize_next_url(next_url, fallback="/"):
     return next_url
 
 
+def is_valid_email(email):
+    return bool(re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", (email or "").strip()))
+
+
+def is_valid_uae_mobile(phone):
+    return bool(re.fullmatch(r"05\d{8}", (phone or "").strip()))
+
+
+def clean_digits(value):
+    return re.sub(r"\D", "", value or "")
+
+
+def build_identity_form_data():
+    buyer_profile = session.get("buyer_profile") or {}
+    return {
+        "name": (request.form.get("name") or buyer_profile.get("name") or "").strip(),
+        "email": (request.form.get("email") or buyer_profile.get("email") or "").strip().lower(),
+        "phone": clean_digits(request.form.get("phone") or buyer_profile.get("phone") or ""),
+    }
+
+
+def validate_lead_identity(form_data):
+    errors = []
+    if not form_data["name"]:
+        errors.append("Please enter your name.")
+    if not is_valid_email(form_data["email"]):
+        errors.append("Please enter a valid email address.")
+    if not is_valid_uae_mobile(form_data["phone"]):
+        errors.append("Phone number must be 10 digits, start with 05, and contain numbers only.")
+    return errors
+
+
+def parse_preferred_datetime(preferred_date, preferred_time):
+    try:
+        preferred_at = datetime.strptime(
+            f"{preferred_date} {preferred_time}",
+            "%Y-%m-%d %H:%M",
+        )
+    except ValueError:
+        return None
+    return preferred_at
+
+
 def save_buyer_profile(name, email, phone):
     clean_name = name.strip()
     clean_email = email.strip().lower()
@@ -4570,6 +4643,52 @@ def merge_main_and_gallery_images(main_image, gallery_images):
         seen.add(image)
         merged_images.append(image)
     return merged_images
+
+
+def get_session_wishlist_ids():
+    wishlist_ids = []
+    seen = set()
+    for value in session.get("wishlist_ids", []):
+        try:
+            car_id = int(value)
+        except (TypeError, ValueError):
+            continue
+        if car_id in seen:
+            continue
+        seen.add(car_id)
+        wishlist_ids.append(car_id)
+    return wishlist_ids
+
+
+def save_session_wishlist_ids(wishlist_ids):
+    session["wishlist_ids"] = [int(car_id) for car_id in wishlist_ids]
+    session.modified = True
+
+
+def fetch_wishlist_ids(conn):
+    return set(get_session_wishlist_ids())
+
+
+def fetch_wishlist_count():
+    return len(get_session_wishlist_ids())
+
+
+def fetch_session_wishlist_cars(conn):
+    wishlist_ids = get_session_wishlist_ids()
+    if not wishlist_ids:
+        return []
+
+    placeholders = ",".join("?" for _ in wishlist_ids)
+    rows = conn.execute(
+        f"""
+        SELECT *
+        FROM cars
+        WHERE id IN ({placeholders}) AND status = 'Available'
+        """,
+        wishlist_ids,
+    ).fetchall()
+    cars_by_id = {car["id"]: car for car in rows}
+    return [cars_by_id[car_id] for car_id in wishlist_ids if car_id in cars_by_id]
 
 
 def parse_int(value, default=None):
@@ -4966,6 +5085,7 @@ def inject_app_globals():
     return {
         "app_name": APP_NAME,
         "app_version": "Version 7",
+        "wishlist_count": fetch_wishlist_count(),
     }
 
 
@@ -5052,6 +5172,7 @@ def cars():
         params + [LISTINGS_PER_PAGE, offset],
     ).fetchall()
     results = [dict(car) for car in results]
+    wishlist_ids = fetch_wishlist_ids(conn)
     if results:
         car_ids = [car["id"] for car in results]
         placeholders = ",".join("?" for _ in car_ids)
@@ -5090,6 +5211,7 @@ def cars():
         search_options=fetch_search_options(),
         current_filters=request.args,
         pagination=pagination,
+        wishlist_ids=wishlist_ids,
     )
 
 
@@ -5097,6 +5219,7 @@ def cars():
 def car_details(id):
     conn = get_db()
     car = conn.execute("SELECT * FROM cars WHERE id = ?", (id,)).fetchone()
+    is_saved = id in get_session_wishlist_ids()
     images = conn.execute(
         "SELECT * FROM car_images WHERE car_id = ?",
         (id,),
@@ -5122,6 +5245,10 @@ def car_details(id):
         car=car,
         images=images,
         related_cars=related_cars,
+        is_saved=is_saved,
+        lead_errors=session.pop("lead_errors", {}),
+        lead_form_data=session.pop("lead_form_data", {}),
+        today_date=datetime.now().strftime("%Y-%m-%d"),
     )
 
 
@@ -5302,28 +5429,55 @@ def search():
     return redirect(f"/cars?{request.query_string.decode()}")
 
 
-@app.route("/wishlist/<int:car_id>")
+@app.route("/wishlist/<int:car_id>", methods=["GET", "POST"])
 def wishlist(car_id):
     conn = get_db()
-    conn.execute("INSERT INTO wishlist (car_id) VALUES (?)", (car_id,))
-    conn.commit()
+    car_exists = conn.execute(
+        """
+        SELECT id
+        FROM cars
+        WHERE id = ? AND status = 'Available'
+        """,
+        (car_id,),
+    ).fetchone()
     conn.close()
-    return redirect("/mywishlist")
+    if car_exists:
+        wishlist_ids = get_session_wishlist_ids()
+        if car_id not in wishlist_ids:
+            wishlist_ids.insert(0, car_id)
+            save_session_wishlist_ids(wishlist_ids)
+    next_url = normalize_next_url(
+        request.form.get("next") or request.args.get("next"),
+        "/wishlist",
+    )
+    return redirect(next_url)
 
 
 @app.route("/mywishlist")
+def legacy_mywishlist():
+    return redirect("/wishlist")
+
+
+@app.route("/wishlist")
 def mywishlist():
     conn = get_db()
-    saved_cars = conn.execute(
-        """
-        SELECT cars.*
-        FROM cars
-        JOIN wishlist ON cars.id = wishlist.car_id
-        ORDER BY wishlist.id DESC
-        """
-    ).fetchall()
+    saved_cars = fetch_session_wishlist_cars(conn)
     conn.close()
     return render_template("wishlist.html", cars=saved_cars)
+
+
+@app.route("/wishlist/<int:car_id>/remove", methods=["GET", "POST"])
+def remove_from_wishlist(car_id):
+    wishlist_ids = [
+        saved_car_id for saved_car_id in get_session_wishlist_ids()
+        if saved_car_id != car_id
+    ]
+    save_session_wishlist_ids(wishlist_ids)
+    next_url = normalize_next_url(
+        request.form.get("next") or request.args.get("next"),
+        "/wishlist",
+    )
+    return redirect(next_url)
 
 
 @app.route("/blog")
@@ -5341,38 +5495,73 @@ def faq():
 
 @app.route("/contact")
 def contact():
-    return render_template("contact.html")
+    buyer_profile = session.get("buyer_profile") or {}
+    return render_template(
+        "contact.html",
+        contact_errors=[],
+        form_data={
+            "name": buyer_profile.get("name", ""),
+            "email": buyer_profile.get("email", ""),
+            "phone": buyer_profile.get("phone", "05"),
+            "message": "",
+        },
+    )
 
 
 @app.route("/contact", methods=["POST"])
 def contact_submit():
+    form_data = {
+        "name": request.form.get("name", "").strip(),
+        "email": request.form.get("email", "").strip().lower(),
+        "phone": clean_digits(request.form.get("phone", "")),
+        "message": request.form.get("message", "").strip(),
+    }
+    errors = validate_lead_identity(form_data)
+    if not form_data["message"]:
+        errors.append("Please enter a message.")
+
+    if errors:
+        return render_template(
+            "contact.html",
+            contact_errors=errors,
+            form_data=form_data,
+        ), 400
+
     create_lead(
         None,
-        request.form["name"],
-        request.form["email"],
-        request.form.get("phone", ""),
-        request.form.get("message", ""),
-        "general",
+        form_data["name"],
+        form_data["email"],
+        form_data["phone"],
+        form_data["message"],
+        "contact",
     )
+    save_buyer_profile(form_data["name"], form_data["email"], form_data["phone"])
     return redirect("/contact?submitted=1")
 
 
 @app.route("/compare")
 def compare():
-    car1_id = request.args.get("car1", "").strip()
-    car2_id = request.args.get("car2", "").strip()
+    selected_ids = []
+    requested_ids = request.args.getlist("cars")
+    legacy_ids = [request.args.get("car1", ""), request.args.get("car2", "")]
+
+    for raw_id in requested_ids + legacy_ids:
+        car_id = raw_id.strip()
+        if car_id.isdigit() and car_id not in selected_ids:
+            selected_ids.append(car_id)
+        if len(selected_ids) == 4:
+            break
 
     conn = get_db()
     selected_cars = []
 
-    for car_id in [car1_id, car2_id]:
-        if car_id.isdigit():
-            car = conn.execute(
-                "SELECT * FROM cars WHERE id = ?",
-                (int(car_id),),
-            ).fetchone()
-            if car:
-                selected_cars.append(car)
+    for car_id in selected_ids:
+        car = conn.execute(
+            "SELECT * FROM cars WHERE id = ? AND status = 'Available'",
+            (int(car_id),),
+        ).fetchone()
+        if car:
+            selected_cars.append(car)
 
     conn.close()
 
@@ -5380,7 +5569,7 @@ def compare():
         "compare.html",
         cars=selected_cars,
         car_options=fetch_car_options(),
-        selected_ids={"car1": car1_id, "car2": car2_id},
+        selected_ids=[str(car["id"]) for car in selected_cars],
     )
 
 
@@ -5405,23 +5594,88 @@ def dealer():
 
 @app.route("/finance", methods=["GET", "POST"])
 def finance():
+    car_options = fetch_car_options()
+    buyer_profile = session.get("buyer_profile") or {}
+    selected_car_id = request.args.get("car_id", "")
+    form_data = {
+        "name": buyer_profile.get("name", ""),
+        "email": buyer_profile.get("email", ""),
+        "phone": buyer_profile.get("phone", "05"),
+        "car_id": selected_car_id,
+        "budget": "",
+        "down_payment": "",
+        "tenure_months": "48",
+    }
+
     if request.method == "POST":
+        form_data = {
+            "name": request.form.get("name", "").strip(),
+            "email": request.form.get("email", "").strip().lower(),
+            "phone": clean_digits(request.form.get("phone", "")),
+            "car_id": request.form.get("car_id", "").strip(),
+            "budget": clean_digits(request.form.get("budget", "")),
+            "down_payment": clean_digits(request.form.get("down_payment", "")),
+            "tenure_months": clean_digits(request.form.get("tenure_months", "")),
+        }
+        errors = []
+        budget = parse_int(form_data["budget"], 0)
+        down_payment = parse_int(form_data["down_payment"], 0)
+        tenure_months = parse_int(form_data["tenure_months"], 0)
+        car_id = form_data["car_id"]
+
+        if not form_data["name"]:
+            errors.append("Please enter your name.")
+        if not is_valid_email(form_data["email"]):
+            errors.append("Please enter a valid email address.")
+        if not is_valid_uae_mobile(form_data["phone"]):
+            errors.append("Phone number must be 10 digits, start with 05, and contain numbers only.")
+        if budget <= 0:
+            errors.append("Please enter a valid budget amount.")
+        if down_payment < 0:
+            errors.append("Please enter a valid down payment.")
+        if budget > 0 and down_payment >= budget:
+            errors.append("Down payment must be less than the budget.")
+        if tenure_months not in {12, 24, 36, 48, 60}:
+            errors.append("Please select a finance tenure between 12 and 60 months.")
+        if car_id and not any(str(option["id"]) == car_id for option in car_options):
+            errors.append("Please select an available car from the list.")
+
+        if errors:
+            return render_template(
+                "finance.html",
+                car_options=car_options,
+                form_data=form_data,
+                finance_errors=errors,
+            ), 400
+
+        finance_amount = budget - down_payment
+        annual_rate = 0.0399
+        total_payable = finance_amount * (1 + annual_rate * (tenure_months / 12))
+        estimated_monthly = round(total_payable / tenure_months)
         message = (
-            f"Budget: AED {request.form['budget']} | "
-            f"Down payment: AED {request.form['down_payment']} | "
-            f"Months: {request.form['tenure_months']}"
+            f"Budget: AED {budget:,} | "
+            f"Down payment: AED {down_payment:,} | "
+            f"Finance amount: AED {finance_amount:,} | "
+            f"Tenure: {tenure_months} months | "
+            f"Estimated monthly payment: AED {estimated_monthly:,}"
         )
         create_lead(
-            request.form.get("car_id") or None,
-            request.form["name"],
-            request.form["email"],
-            request.form["phone"],
+            int(car_id) if car_id else None,
+            form_data["name"],
+            form_data["email"],
+            form_data["phone"],
             message,
             "finance",
         )
+        save_buyer_profile(form_data["name"], form_data["email"], form_data["phone"])
         return redirect("/finance?submitted=1")
 
-    return render_template("finance.html", car_options=fetch_car_options())
+    return render_template(
+        "finance.html",
+        car_options=car_options,
+        form_data=form_data,
+        finance_errors=[],
+    )
 
 
 @app.route("/recommendations")
@@ -5460,39 +5714,81 @@ def recommendations():
 
 @app.route("/lead/contact/<int:car_id>", methods=["POST"])
 def contact_seller(car_id):
-    name, email, phone = get_lead_identity()
-    if not all([name, email, phone]):
-        return redirect(f"/login?next=/car/{car_id}")
+    conn = get_db()
+    car = conn.execute(
+        "SELECT id FROM cars WHERE id = ? AND status = 'Available'",
+        (car_id,),
+    ).fetchone()
+    conn.close()
+    if not car:
+        return redirect("/cars")
+
+    form_data = build_identity_form_data()
+    form_data["message"] = request.form.get("message", "").strip()
+    errors = validate_lead_identity(form_data)
+    if not form_data["message"]:
+        errors.append("Please enter your question for the seller.")
+
+    if errors:
+        session["lead_errors"] = {"contact": errors}
+        session["lead_form_data"] = {"contact": form_data}
+        return redirect(f"/car/{car_id}?lead=contact")
 
     create_lead(
         car_id,
-        name,
-        email,
-        phone,
-        request.form.get("message", ""),
+        form_data["name"],
+        form_data["email"],
+        form_data["phone"],
+        form_data["message"],
         "seller",
     )
+    save_buyer_profile(form_data["name"], form_data["email"], form_data["phone"])
     return redirect(f"/car/{car_id}?contact=sent")
 
 
 @app.route("/lead/book/<int:car_id>", methods=["POST"])
 def book_test_drive(car_id):
-    name, email, phone = get_lead_identity()
-    if not all([name, email, phone]):
-        return redirect(f"/login?next=/car/{car_id}")
+    conn = get_db()
+    car = conn.execute(
+        "SELECT id FROM cars WHERE id = ? AND status = 'Available'",
+        (car_id,),
+    ).fetchone()
+    conn.close()
+    if not car:
+        return redirect("/cars")
+
+    form_data = build_identity_form_data()
+    form_data["preferred_date"] = request.form.get("preferred_date", "").strip()
+    form_data["preferred_time"] = request.form.get("preferred_time", "").strip()
+    errors = validate_lead_identity(form_data)
+    preferred_at = parse_preferred_datetime(
+        form_data["preferred_date"],
+        form_data["preferred_time"],
+    )
+
+    if preferred_at is None:
+        errors.append("Please choose a valid test-drive date and time.")
+    elif preferred_at <= datetime.now():
+        errors.append("Please choose a future test-drive date and time.")
+
+    if errors:
+        session["lead_errors"] = {"test_drive": errors}
+        session["lead_form_data"] = {"test_drive": form_data}
+        return redirect(f"/car/{car_id}?lead=test_drive")
 
     message = (
-        f"Preferred date: {request.form.get('preferred_date', '')} | "
-        f"Preferred time: {request.form.get('preferred_time', '')}"
+        f"Preferred date: {form_data['preferred_date']} | "
+        f"Preferred time: {form_data['preferred_time']}"
     )
     create_lead(
         car_id,
-        name,
-        email,
-        phone,
+        form_data["name"],
+        form_data["email"],
+        form_data["phone"],
         message,
         "test_drive",
     )
+    save_buyer_profile(form_data["name"], form_data["email"], form_data["phone"])
     return redirect(f"/car/{car_id}?booking=sent")
 
 
@@ -5509,14 +5805,17 @@ def login():
         account_type = request.form.get("account_type", "buyer")
 
         if account_type == "buyer":
-            name = request.form.get("name", "")
-            email = request.form.get("email", "")
-            phone = request.form.get("phone", "")
+            form_data = {
+                "name": request.form.get("name", "").strip(),
+                "email": request.form.get("email", "").strip().lower(),
+                "phone": clean_digits(request.form.get("phone", "")),
+            }
+            buyer_errors = validate_lead_identity(form_data)
 
-            if not all([name.strip(), email.strip(), phone.strip()]):
-                buyer_error = "Please enter your name, email, and phone number."
+            if buyer_errors:
+                buyer_error = " ".join(buyer_errors)
             else:
-                save_buyer_profile(name, email, phone)
+                save_buyer_profile(form_data["name"], form_data["email"], form_data["phone"])
                 return redirect(next_url)
 
         else:

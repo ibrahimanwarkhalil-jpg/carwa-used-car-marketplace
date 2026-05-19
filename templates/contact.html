@@ -12,22 +12,31 @@
 
 {% if request.args.get("submitted") %}
 <div class="image-help mb-4">
-Your message was submitted. CARWA can now store general contact leads in the database for admin follow-up.
+Your message was submitted. CARWA can now follow up from the admin dashboard.
 </div>
 {% endif %}
 
-<form class="row g-3" method="POST" action="/contact">
+{% if contact_errors %}
+<div class="finance-error-list mb-4">
+{% for error in contact_errors %}
+<div>{{ error }}</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<form class="row g-3" method="POST" action="/contact" novalidate data-lead-form>
 <div class="col-md-6">
-<input class="form-control" name="name" placeholder="Your Name" required>
+<input class="form-control" name="name" value="{{ form_data.name }}" placeholder="Your Name" autocomplete="name" required>
 </div>
 <div class="col-md-6">
-<input class="form-control" name="email" placeholder="Email Address" required>
+<input class="form-control" type="email" name="email" value="{{ form_data.email }}" placeholder="Email Address" autocomplete="email" required>
 </div>
 <div class="col-md-12">
-<input class="form-control" name="phone" placeholder="Phone Number">
+<input class="form-control" name="phone" value="{{ form_data.phone or '05' }}" placeholder="05XXXXXXXX" inputmode="numeric" pattern="05[0-9]{8}" maxlength="10" minlength="10" autocomplete="tel" data-phone-input required>
+<small class="form-hint">UAE mobile number only, for example 05XXXXXXXX.</small>
 </div>
 <div class="col-md-12">
-<textarea class="form-control" name="message" rows="5" placeholder="Tell us what you need"></textarea>
+<textarea class="form-control" name="message" rows="5" placeholder="Tell us what you need" required>{{ form_data.message }}</textarea>
 </div>
 <div class="col-md-12">
 <button class="btn btn-dark">Send Message</button>
@@ -37,4 +46,8 @@ Your message was submitted. CARWA can now store general contact leads in the dat
 </div>
 </section>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/lead-forms.js?v=1"></script>
 {% endblock %}

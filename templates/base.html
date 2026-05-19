@@ -110,7 +110,7 @@
 
 <div class="nav-action-group nav-account-group">
 
-{% if session.get("admin_username") %}
+{% if is_admin_context %}
 <a href="/admin" class="nav-profile-pill nav-profile-link" aria-label="Open admin dashboard">
 {{ session.get("admin_username") }}
 </a>

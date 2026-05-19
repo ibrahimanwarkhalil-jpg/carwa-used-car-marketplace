@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const actionLabel = isDark ? "Switch to day mode" : "Switch to dark mode";
       toggle.setAttribute("aria-label", actionLabel);
       toggle.setAttribute("title", actionLabel);
+      toggle.setAttribute("data-tooltip", actionLabel);
     }
   }
 

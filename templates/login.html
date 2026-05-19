@@ -36,7 +36,7 @@
 
 <div class="col-12">
 <label>Phone Number</label>
-<input class="form-control" name="phone" value="{{ session.get('buyer_profile', {}).get('phone', '') }}" required>
+<input class="form-control" name="phone" value="{{ session.get('buyer_profile', {}).get('phone', '05') }}" inputmode="numeric" pattern="05[0-9]{8}" maxlength="10" minlength="10" autocomplete="tel" data-phone-input required>
 </div>
 
 <div class="col-12">
@@ -128,5 +128,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 </script>
+<script src="/static/js/lead-forms.js?v=1"></script>
 
 {% endblock %}

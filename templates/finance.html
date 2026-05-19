@@ -12,24 +12,33 @@
 
 {% if request.args.get("submitted") %}
 <div class="image-help mb-4">
-Your finance request was submitted and is now visible in the admin dashboard.
+Your finance request was submitted. Our team can now review it from the admin dashboard and follow up with you.
 </div>
 {% endif %}
 
-<form method="POST" action="/finance" class="row g-3">
+{% if finance_errors %}
+<div class="finance-error-list mb-4">
+{% for error in finance_errors %}
+<div>{{ error }}</div>
+{% endfor %}
+</div>
+{% endif %}
+
+<form method="POST" action="/finance" class="row g-3" novalidate>
 <div class="col-md-6">
 <label>Name</label>
-<input class="form-control" name="name" required>
+<input class="form-control" name="name" value="{{ form_data.name }}" autocomplete="name" required>
 </div>
 
 <div class="col-md-6">
 <label>Email</label>
-<input class="form-control" name="email" required>
+<input class="form-control" type="email" name="email" value="{{ form_data.email }}" placeholder="name@example.com" autocomplete="email" required>
 </div>
 
 <div class="col-md-6">
 <label>Phone</label>
-<input class="form-control" name="phone" required>
+<input class="form-control" name="phone" value="{{ form_data.phone or '05' }}" inputmode="numeric" pattern="05[0-9]{8}" maxlength="10" minlength="10" autocomplete="tel" data-phone-input required>
+<small class="form-hint">UAE mobile number only, for example 05XXXXXXXX.</small>
 </div>
 
 <div class="col-md-6">
@@ -37,24 +46,37 @@ Your finance request was submitted and is now visible in the admin dashboard.
 <select class="form-control" name="car_id">
 <option value="">General Finance Inquiry</option>
 {% for option in car_options %}
-<option value="{{ option.id }}" {% if request.args.get("car_id") == (option.id ~ '') %}selected{% endif %}>{{ option.title }} | AED {{ "{:,}".format(option.price) }}</option>
+<option value="{{ option.id }}" {% if form_data.car_id == (option.id ~ '') %}selected{% endif %}>{{ option.title }} | AED {{ "{:,}".format(option.price) }}</option>
 {% endfor %}
 </select>
 </div>
 
 <div class="col-md-4">
-<label>Budget</label>
-<input class="form-control" name="budget" placeholder="90000" required>
+<label>Budget (AED)</label>
+<input class="form-control" name="budget" value="{{ form_data.budget }}" placeholder="90000" inputmode="numeric" pattern="[0-9]+" data-digits-only required>
 </div>
 
 <div class="col-md-4">
-<label>Down Payment</label>
-<input class="form-control" name="down_payment" placeholder="20000" required>
+<label>Down Payment (AED)</label>
+<input class="form-control" name="down_payment" value="{{ form_data.down_payment }}" placeholder="20000" inputmode="numeric" pattern="[0-9]+" data-digits-only required>
 </div>
 
 <div class="col-md-4">
 <label>Tenure (Months)</label>
-<input class="form-control" name="tenure_months" placeholder="48" required>
+<select class="form-control" name="tenure_months" required>
+{% for months in [12, 24, 36, 48, 60] %}
+<option value="{{ months }}" {% if form_data.tenure_months == (months ~ '') %}selected{% endif %}>{{ months }} months</option>
+{% endfor %}
+</select>
+</div>
+
+<div class="col-12">
+<div class="finance-preview" data-finance-preview hidden>
+<span>Estimated finance amount</span>
+<strong data-finance-amount>AED 0</strong>
+<span>Estimated monthly payment</span>
+<strong data-finance-monthly>AED 0</strong>
+</div>
 </div>
 
 <div class="col-12">
@@ -65,4 +87,8 @@ Your finance request was submitted and is now visible in the admin dashboard.
 </div>
 </section>
 
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/finance.js?v=1"></script>
 {% endblock %}

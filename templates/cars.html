@@ -161,8 +161,26 @@
 <strong>AED {{ "{:,}".format(car.price) }}</strong>
 <div class="card-actions">
 <a href="/car/{{ car.id }}" class="btn btn-dark">View</a>
-<a href="/wishlist/{{ car.id }}" class="btn btn-outline-danger">Save</a>
-<a href="/compare?car1={{ car.id }}" class="btn btn-outline-secondary">Compare</a>
+{% if car.id in wishlist_ids %}
+<form action="/wishlist/{{ car.id }}/remove" method="POST" class="wishlist-action-form">
+<input type="hidden" name="next" value="{{ request.full_path }}">
+<button type="submit" class="btn btn-outline-danger">
+<i class="fa-solid fa-heart-crack"></i>
+Remove
+</button>
+</form>
+{% else %}
+<form action="/wishlist/{{ car.id }}" method="POST" class="wishlist-action-form">
+<input type="hidden" name="next" value="{{ request.full_path }}">
+<button type="submit" class="btn btn-outline-danger">
+<i class="fa-regular fa-heart"></i>
+Save
+</button>
+</form>
+{% endif %}
+<button type="button" class="btn btn-outline-dark" data-compare-add data-car-id="{{ car.id }}" data-car-title="{{ car.title }}">
+Compare
+</button>
 </div>
 </div>
 </div>

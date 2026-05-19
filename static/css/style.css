@@ -97,7 +97,7 @@ grid-template-columns:auto minmax(0, 1fr) auto;
 grid-template-areas:
 "logo nav actions";
 align-items:center;
-gap:14px 20px;
+gap:14px 12px;
 }
 
 .navbar-brand{
@@ -159,7 +159,7 @@ grid-area:nav;
 display:flex;
 align-items:center;
 justify-content:center;
-gap:0.08rem;
+gap:0;
 margin:0;
 flex-wrap:wrap;
 width:100%;
@@ -171,7 +171,7 @@ row-gap:0.15rem;
 color:var(--text);
 font-weight:600;
 font-size:0.86rem;
-padding:0.46rem 0.52rem !important;
+padding:0.46rem 0.42rem !important;
 white-space:nowrap;
 border-radius:999px;
 transition:background 0.2s ease, color 0.2s ease;
@@ -193,7 +193,7 @@ display:flex;
 align-items:center;
 justify-content:flex-end;
 flex-wrap:nowrap;
-gap:0.45rem;
+gap:0.35rem;
 min-width:0;
 white-space:nowrap;
 }
@@ -215,7 +215,7 @@ display:inline-flex;
 align-items:center;
 justify-content:center;
 gap:0.4rem;
-padding:0.52rem 0.72rem;
+padding:0.52rem 0.64rem;
 border-radius:999px;
 font-size:0.8rem;
 font-weight:700;
@@ -1458,7 +1458,7 @@ border:1px solid var(--line);
 color:var(--muted);
 }
 
-@media (max-width: 1500px){
+@media (max-width: 1420px){
 .navbar-shell{
 grid-template-columns:auto minmax(0, 1fr);
 grid-template-areas:
